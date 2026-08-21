@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+:root {
+  --background: #191825;
+  --surface: #242236;
+  --surface-2: #2e2c45;
+  --border: #3b3a5a;
+  --text-primary: #ffffff;
+  --text-muted: #b8b6db;
+  --text-subtle: #8280ad;
+  --accent-1: #865DFF;
+  --accent-2: #E384FF;
+  --accent-3: #FFA3FD;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+section {
+  scroll-margin-top: 64px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--background); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-1); }
+
+/* Selection */
+::selection {
+  background: var(--accent-1);
+  color: var(--text-primary);
+}
+
+/* Section base */
+.section {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background-color: var(--background);
+  z-index: 1;
+}
+
+/* Flat card */
+.flat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+/* Gradient text */
+.gradient-text-accent {
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Section label */
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  opacity: 0.9;
+}
+
+/* Float animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+.float { animation: float 3s ease-in-out infinite; }
+.float-slow { animation: float-slow 6s ease-in-out infinite; }
+
+/* Cursor blink */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+.cursor-blink { animation: blink 1s step-end infinite; }
+
+/* Ink splash easter egg */
+@keyframes ink-spread {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+/* Scan line effect */
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}

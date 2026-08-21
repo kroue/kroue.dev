@@ -1,0 +1,37 @@
+export const TECH_URLS: Record<string, string> = {
+  React: "https://react.dev",
+  "Next.js": "https://nextjs.org",
+  Vue: "https://vuejs.org",
+  Angular: "https://angular.dev",
+  TypeScript: "https://www.typescriptlang.org",
+  JavaScript: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+  "Tailwind CSS": "https://tailwindcss.com",
+  Tailwind: "https://tailwindcss.com",
+  "shadcn/ui": "https://ui.shadcn.com",
+  Firebase: "https://firebase.google.com",
+  Supabase: "https://supabase.com",
+  PostgreSQL: "https://www.postgresql.org",
+  Postgre: "https://www.postgresql.org",
+  MySQL: "https://www.mysql.com",
+  NoSQL: "https://mongodb.com",
+  Python: "https://www.python.org",
+  Django: "https://www.djangoproject.com",
+  Rust: "https://www.rust-lang.org",
+  Java: "https://www.java.com",
+  "C++": "https://isocpp.org",
+  "C#": "https://learn.microsoft.com/en-us/dotnet/csharp/",
+  "Android SDK": "https://developer.android.com",
+  Web3: "https://web3js.readthedocs.io",
+  Vercel: "https://vercel.com",
+  Expo: "https://expo.dev",
+  "VS Code": "https://code.visualstudio.com",
+  VSCode: "https://code.visualstudio.com",
+  Git: "https://git-scm.com",
+  Vite: "https://vitejs.dev",
+  ESLint: "https://eslint.org",
+  "Framer Motion": "https://motion.dev",
+};
+
+export function getTechUrl(name: string): string {
+  return TECH_URLS[name] || `https://www.google.com/search?q=${encodeURIComponent(name + " documentation")}`;
+}
