@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useInView, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, useInView, AnimatePresence, useScroll, useTransform, Variants } from "framer-motion";
 import RevealText from "@/components/ui/RevealText";
 import ShapeTransition from "@/components/ui/ShapeTransition";
 import TechIcon from "@/components/ui/TechIcon";
@@ -108,7 +108,7 @@ function ProjectCard({ project }: { project: Project }) {
                 background: `${colors.border}15`,
                 fontSize: "1.1rem",
                 textDecoration: "none",
-                shrink: 0,
+                flexShrink: 0,
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLElement).style.color = "#191825";
@@ -188,7 +188,7 @@ export default function Projects() {
     setCurrentIndex((prev) => (prev - 1 + totalProjects) % totalProjects);
   };
 
-  const slideVariants = {
+  const slideVariants: Variants = {
     enter: (dir: number) => ({
       x: dir > 0 ? 300 : -300,
       opacity: 0,

@@ -13,13 +13,12 @@ function SnapManager() {
     const snap = new Snap(lenis, {
       type: "proximity",
       duration: 0.8,
-      velocityThreshold: 0.3,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     });
 
     const elements = Array.from(document.querySelectorAll("#hero, #about, #stack, #projects"));
     elements.forEach((el) => {
-      snap.addElement(el as HTMLElement, { offset: 0 });
+      snap.addElement(el as HTMLElement);
     });
 
     return () => {
