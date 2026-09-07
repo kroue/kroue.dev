@@ -279,6 +279,42 @@ export default function TechIcon({ name, className = "", size = 14 }: TechIconPr
           <path d="M0 0h12v12H0zM12 0h12v12H12zM0 12h12v12H0zM12 12h12l-12 12z" />
         </svg>
       );
+    case "kotlin":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className}>
+          <path d="M24 24H0V0h24L12 12l12 12z" />
+        </svg>
+      );
+    case "jetpackcompose":
+    case "compose":
+    case "material3":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className}>
+          <path d="M12 1.5l9 5.25v10.5L12 22.5l-9-5.25V6.75L12 1.5zm0 2.31L5 7.84v8.32l7 4.03 7-4.03V7.84l-7-4.03zm0 3.19l4.5 2.6v5.2L12 17.4l-4.5-2.6v-5.2L12 7z" />
+        </svg>
+      );
+    case "hilt":
+    case "room":
+    case "workmanager":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className}>
+          <path d="M4 4h7v7H4V4zm9 0h7v7h-7V4zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" />
+        </svg>
+      );
+    case "fastapi":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className}>
+          <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-.86 5.5h5.36l-3.5 5.25h3.36L10.5 19v-5.75H7.14L11.14 5.5z" />
+        </svg>
+      );
+    case "sql":
+    case "recharts":
+    case "restapis":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className}>
+          <path d="M3 20h18v2H3v-2zm2-8h3v7H5v-7zm5-5h3v12h-3V7zm5 8h3v4h-3v-4zM4 2h16v2H4V2z" />
+        </svg>
+      );
     default:
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className}>

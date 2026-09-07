@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <title>&lt;k/&gt;</title>
+  <!-- Site background, flat and square to match the design language -->
+  <rect width="64" height="64" fill="#191825"/>
+  <!-- Hairline border, echoing the card borders on the site -->
+  <rect x="0.5" y="0.5" width="63" height="63" fill="none" stroke="#3b3a5a" stroke-width="1"/>
+
+  <!-- The brackets sit in opposite corners rather than inline. Four glyphs on
+       one line turn to mush at a 16px tab size; this way the k stays legible
+       when tiny and the mark still reads as <k/> at larger sizes. -->
+  <g
+    font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'JetBrains Mono', monospace"
+    font-weight="700"
+    fill="#865dff"
+    font-size="17"
+  >
+    <text x="6" y="20">&lt;</text>
+    <text x="58" y="57" text-anchor="end">/&gt;</text>
+  </g>
+
+  <text
+    x="32"
+    y="46"
+    text-anchor="middle"
+    font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'JetBrains Mono', monospace"
+    font-size="40"
+    font-weight="700"
+    fill="#ffffff"
+  >k</text>
+</svg>

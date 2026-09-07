@@ -1,0 +1,76 @@
+rules_version = '2';
+
+// Deploy with:  firebase deploy --only firestore:rules
+//
+// The portfolio ships its Firebase config to the browser (NEXT_PUBLIC_*), so
+// these rules are the only thing standing between the public and the database.
+//
+// Two audiences:
+//   - the public contact form, which may only APPEND a well-formed message
+//   - the /overseer console, which may read messages once signed in AS AN ADMIN
+//
+// Admin status is a document in `admins` keyed by the account's auth UID. Create
+// it by hand in the Firebase console; nothing in the app can grant itself admin.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+          && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isWellFormedMessage(data) {
+      return data.keys().hasOnly(['name', 'email', 'message', 'createdAt', 'status', 'source'])
+          && data.keys().hasAll(['name', 'email', 'message', 'createdAt'])
+
+          && data.name is string
+          && data.name.size() >= 2
+          && data.name.size() <= 80
+
+          && data.email is string
+          && data.email.size() <= 254
+          && data.email.matches('^[^@\\s]+@[^@\\s]+[.][^@\\s]{2,}$')
+
+          && data.message is string
+          && data.message.size() >= 10
+          && data.message.size() <= 2000
+
+          // Forces the server clock, so a client cannot backdate a message.
+          && data.createdAt == request.time
+
+          && (!('status' in data.keys()) || data.status == 'new')
+          && (!('source' in data.keys()) || data.source == 'portfolio-contact-form');
+    }
+
+    match /messages/{messageId} {
+      // Anyone may send exactly one well-formed message.
+      allow create: if isWellFormedMessage(request.resource.data);
+
+      // Only a signed-in admin can read the inbox.
+      allow read: if isAdmin();
+
+      // Admins may flip the triage status and nothing else — the visitor's
+      // name, email, message, and timestamp stay immutable.
+      allow update: if isAdmin()
+                    && request.resource.data.diff(resource.data)
+                         .affectedKeys().hasOnly(['status'])
+                    && request.resource.data.status in ['new', 'read', 'archived'];
+
+      // Deletion is deliberately not available to the client.
+      allow delete: if false;
+    }
+
+    match /admins/{uid} {
+      // An admin may confirm their own membership; nobody can list the
+      // collection, and nobody can grant admin from the client.
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+
+    // Anything not matched above is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

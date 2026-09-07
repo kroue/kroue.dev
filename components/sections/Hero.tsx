@@ -4,62 +4,65 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import RevealText from "@/components/ui/RevealText";
+import { ROLES } from "@/lib/resume";
 
 const FloatingGeometry = dynamic(
   () => import("@/components/three/FloatingGeometry"),
   { ssr: false }
 );
 
-const ROLES = ["Creative Web Developer", "Front-End Engineer", "UI Craftsman", "React Specialist"];
-
 function TypewriterText() {
   const [roleIndex, setRoleIndex] = useState(0);
   const [displayed, setDisplayed] = useState("");
   const [deleting, setDeleting] = useState(false);
-  const [paused, setPaused] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+  // Every transition is scheduled on a timer, so the effect never calls
+  // setState synchronously and cascades an extra render.
   useEffect(() => {
     const current = ROLES[roleIndex];
-    if (paused) {
-      timeoutRef.current = setTimeout(() => {
-        setPaused(false);
-        setDeleting(true);
-      }, 2000);
-      return;
-    }
-    if (!deleting) {
-      if (displayed.length < current.length) {
-        timeoutRef.current = setTimeout(() => {
-          setDisplayed(current.slice(0, displayed.length + 1));
-        }, 60);
-      } else {
-        setPaused(true);
-      }
+
+    if (!deleting && displayed === current) {
+      // Word complete — hold it, then start erasing.
+      timeoutRef.current = setTimeout(() => setDeleting(true), 2000);
+    } else if (!deleting) {
+      timeoutRef.current = setTimeout(
+        () => setDisplayed(current.slice(0, displayed.length + 1)),
+        60
+      );
+    } else if (displayed.length > 0) {
+      timeoutRef.current = setTimeout(
+        () => setDisplayed(displayed.slice(0, -1)),
+        35
+      );
     } else {
-      if (displayed.length > 0) {
-        timeoutRef.current = setTimeout(() => {
-          setDisplayed(displayed.slice(0, -1));
-        }, 35);
-      } else {
+      // Erased — move on to the next role.
+      timeoutRef.current = setTimeout(() => {
         setDeleting(false);
         setRoleIndex((i) => (i + 1) % ROLES.length);
-      }
+      }, 200);
     }
+
     return () => clearTimeout(timeoutRef.current);
-  }, [displayed, deleting, paused, roleIndex]);
+  }, [displayed, deleting, roleIndex]);
 
   return (
-    <span
-      style={{
-        fontFamily: "JetBrains Mono, monospace",
-        fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
-        color: "var(--accent-1)",
-      }}
-    >
-      {displayed}
-      <span className="cursor-blink">|</span>
-    </span>
+    <>
+      {/* The animation is decorative; assistive tech gets the full list once
+          instead of a character-by-character stream. */}
+      <span className="sr-only">{ROLES.join(", ")}</span>
+      <span
+        aria-hidden="true"
+        className="mono"
+        style={{
+          fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+          color: "var(--accent-1)",
+        }}
+      >
+        {displayed}
+        <span className="cursor-blink">|</span>
+      </span>
+    </>
   );
 }
 
@@ -98,21 +101,23 @@ export default function Hero() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="inline-flex items-center gap-2 mb-6 px-3 py-1 rounded-full"
+          className="inline-flex items-center gap-2 mb-6 mono"
           style={{
             border: "1px solid var(--border)",
             background: "var(--surface)",
+            borderRadius: "var(--radius-pill)",
             fontSize: "0.72rem",
-            fontFamily: "JetBrains Mono, monospace",
             color: "var(--text-muted)",
             padding: "6px 16px",
           }}
         >
           <span
-            className="w-2 h-2 rounded-full"
+            className="w-2 h-2 pulse-dot"
             style={{
               background: "var(--accent-2)",
+              borderRadius: "var(--radius-pill)",
             }}
+            aria-hidden="true"
           />
           Available for work
         </motion.div>
@@ -124,7 +129,7 @@ export default function Hero() {
           transition={{ delay: 0.3, duration: 0.7 }}
           id="hero-name"
           style={{
-            fontSize: "clamp(3rem, 9vw, 6.5rem)",
+            fontSize: "var(--step-4)",
             fontWeight: 900,
             lineHeight: 1.05,
             letterSpacing: "-0.02em",
@@ -156,7 +161,7 @@ export default function Hero() {
             fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
             fontWeight: 500,
             color: "var(--text-subtle)",
-            marginTop: "-1rem",
+            marginTop: "0.35rem",
             marginBottom: "0.5rem",
             letterSpacing: "0.05em",
             display: "flex",
@@ -177,7 +182,7 @@ export default function Hero() {
 
         {/* Tagline */}
         <RevealText
-          text="From graduate to builder — I craft fast, beautiful web interfaces with React, Next.js & TypeScript. Based in Cagayan de Oro 🇵🇭"
+          text="I ship production systems for paying clients — offline-first Android field apps, POS and inventory platforms, and the web consoles behind them. Cagayan de Oro, open to remote."
           elementType="p"
           delay={0.8}
           stagger={0.01}
@@ -198,35 +203,10 @@ export default function Hero() {
           transition={{ delay: 1.0 }}
           className="flex flex-wrap gap-4 justify-center"
         >
-          <a
-            href="#projects"
-            className="px-7 py-3 rounded-none font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
-            style={{
-              background: "var(--accent-1)",
-              color: "#ffffff",
-              fontSize: "0.95rem",
-              padding: "12px 32px",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <a href="#projects" className="btn btn-primary">
             View My Work
           </a>
-          <a
-            href="#contact"
-            className="px-7 py-3 rounded-none font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
-            style={{
-              border: "1px solid var(--border)",
-              color: "var(--text-primary)",
-              fontSize: "0.95rem",
-              background: "var(--surface)",
-              padding: "12px 32px",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <a href="#contact" className="btn btn-ghost">
             Get In Touch
           </a>
         </motion.div>

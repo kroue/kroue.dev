@@ -57,7 +57,7 @@ const ORBITS: Record<string, TierOrbit> = {
   },
   tooling: {
     id: "tooling",
-    color: "#FFA3FD",
+    color: "#5EC8FF",
     radius: 2.1,
     tiltX: -0.2,
     tiltZ: 0.6,
@@ -74,32 +74,34 @@ interface Skill {
   initialAngle: number;
 }
 
+// Rings mirror the four Stack tiers, which mirror the résumé's skill groups.
+// The `tier` keys stay as-is (they index ORBITS); only the contents changed.
 const SKILLS: Skill[] = [
-  // Frontend Ring (6 items)
+  // Web ring (6 items)
   { name: "React", tier: "frontend", initialAngle: 0 },
   { name: "Next.js", tier: "frontend", initialAngle: Math.PI / 3 },
-  { name: "Vue", tier: "frontend", initialAngle: (2 * Math.PI) / 3 },
+  { name: "Angular", tier: "frontend", initialAngle: (2 * Math.PI) / 3 },
   { name: "TypeScript", tier: "frontend", initialAngle: Math.PI },
-  { name: "Angular", tier: "frontend", initialAngle: (4 * Math.PI) / 3 },
+  { name: "Vue", tier: "frontend", initialAngle: (4 * Math.PI) / 3 },
   { name: "Tailwind", tier: "frontend", initialAngle: (5 * Math.PI) / 3 },
 
-  // Backend Ring (6 items)
-  { name: "Firebase", tier: "backend", initialAngle: 0 },
-  { name: "Supabase", tier: "backend", initialAngle: Math.PI / 3 },
-  { name: "PostgreSQL", tier: "backend", initialAngle: (2 * Math.PI) / 3 },
-  { name: "MySQL", tier: "backend", initialAngle: Math.PI },
-  { name: "Python", tier: "backend", initialAngle: (4 * Math.PI) / 3 },
-  { name: "Django", tier: "backend", initialAngle: (5 * Math.PI) / 3 },
+  // Mobile ring (6 items)
+  { name: "Kotlin", tier: "backend", initialAngle: 0 },
+  { name: "Compose", tier: "backend", initialAngle: Math.PI / 3 },
+  { name: "Room", tier: "backend", initialAngle: (2 * Math.PI) / 3 },
+  { name: "Hilt", tier: "backend", initialAngle: Math.PI },
+  { name: "WorkManager", tier: "backend", initialAngle: (4 * Math.PI) / 3 },
+  { name: "React Native", tier: "backend", initialAngle: (5 * Math.PI) / 3 },
 
-  // Systems Ring (6 items)
-  { name: "Rust", tier: "systems", initialAngle: 0 },
-  { name: "Java", tier: "systems", initialAngle: Math.PI / 3 },
-  { name: "C++", tier: "systems", initialAngle: (2 * Math.PI) / 3 },
-  { name: "C#", tier: "systems", initialAngle: Math.PI },
-  { name: "Android SDK", tier: "systems", initialAngle: (4 * Math.PI) / 3 },
-  { name: "Web3", tier: "systems", initialAngle: (5 * Math.PI) / 3 },
+  // Backend / Data ring (6 items)
+  { name: "Firebase", tier: "systems", initialAngle: 0 },
+  { name: "Supabase", tier: "systems", initialAngle: Math.PI / 3 },
+  { name: "PostgreSQL", tier: "systems", initialAngle: (2 * Math.PI) / 3 },
+  { name: "FastAPI", tier: "systems", initialAngle: Math.PI },
+  { name: "Python", tier: "systems", initialAngle: (4 * Math.PI) / 3 },
+  { name: "Django", tier: "systems", initialAngle: (5 * Math.PI) / 3 },
 
-  // Tooling Ring (5 items)
+  // Tools ring (5 items)
   { name: "Vercel", tier: "tooling", initialAngle: 0 },
   { name: "Expo", tier: "tooling", initialAngle: (2 * Math.PI) / 5 },
   { name: "VS Code", tier: "tooling", initialAngle: (4 * Math.PI) / 5 },

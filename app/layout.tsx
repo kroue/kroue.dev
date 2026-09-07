@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/providers/SmoothScroll";
@@ -16,11 +16,15 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aljohn Arranguez | Creative Front-End Developer",
+  title: "Aljohn Arranguez | Full-Stack & Mobile Developer",
   description:
-    "Portfolio of Aljohn Arranguez — a creative front-end developer from Cagayan de Oro specializing in React, Next.js, TypeScript, and Tailwind CSS. Building performant, beautiful web experiences.",
+    "Portfolio of Aljohn Arranguez — a full-stack and mobile developer from Cagayan de Oro shipping production systems in TypeScript (React, Next.js, Angular) and Kotlin (Jetpack Compose), with a specialty in offline-first architecture.",
   keywords: [
-    "front-end developer",
+    "full-stack developer",
+    "mobile developer",
+    "Kotlin",
+    "Jetpack Compose",
+    "offline-first",
     "React",
     "Next.js",
     "TypeScript",
@@ -31,12 +35,30 @@ export const metadata: Metadata = {
     "portfolio",
   ],
   authors: [{ name: "Aljohn Arranguez" }],
+  creator: "Aljohn Arranguez",
   openGraph: {
-    title: "Aljohn Arranguez | Creative Front-End Developer",
+    title: "Aljohn Arranguez | Full-Stack & Mobile Developer",
     description:
-      "Creative front-end developer building clean, performant UIs with React, Next.js, and TypeScript.",
+      "Full-stack and mobile developer shipping production systems: offline-first Android field apps, POS and inventory platforms, and the web consoles behind them.",
     type: "website",
+    locale: "en_US",
+    siteName: "Aljohn Arranguez",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Aljohn Arranguez | Full-Stack & Mobile Developer",
+    description:
+      "Full-stack and mobile developer shipping production systems: offline-first Android field apps, POS and inventory platforms, and the web consoles behind them.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#191825",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -47,6 +69,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased">
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

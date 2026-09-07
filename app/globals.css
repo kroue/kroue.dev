@@ -1,17 +1,121 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Design tokens
+   ============================================================ */
 :root {
+  /* Surfaces */
   --background: #191825;
   --surface: #242236;
   --surface-2: #2e2c45;
+  --surface-3: #383654;
+  --surface-glass: rgba(25, 24, 37, 0.72);
+
+  /* Lines */
   --border: #3b3a5a;
+  --border-strong: #4c4a72;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+
+  /* Text */
   --text-primary: #ffffff;
   --text-muted: #b8b6db;
   --text-subtle: #8280ad;
-  --accent-1: #865DFF;
-  --accent-2: #E384FF;
-  --accent-3: #FFA3FD;
+
+  /* Accents */
+  --accent-1: #865dff;
+  --accent-2: #e384ff;
+  --accent-3: #ffa3fd;
+  /* Fourth hue so the four stack tiers each read distinctly; the previous
+     palette gave "Systems" and "Tooling" the same colour. */
+  --accent-4: #5ec8ff;
+
+  /* Accent alpha ramps, so components stop appending ad-hoc hex suffixes */
+  --accent-1-a10: rgba(134, 93, 255, 0.1);
+  --accent-1-a20: rgba(134, 93, 255, 0.2);
+  --accent-1-a40: rgba(134, 93, 255, 0.4);
+  --accent-2-a10: rgba(227, 132, 255, 0.1);
+  --accent-2-a40: rgba(227, 132, 255, 0.4);
+
+  /* Status */
+  --danger: #ff7a7a;
+  --danger-bg: rgba(255, 122, 122, 0.1);
+  --success: #6ee7b7;
+  --success-bg: rgba(110, 231, 183, 0.1);
+
+  /* Radii. The design is deliberately flat, so rectangles stay square
+     and only true pills/circles round. */
+  --radius: 0px;
+  --radius-pill: 999px;
+
+  /* Elevation, kept restrained to suit the flat look */
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Focus ring */
+  --ring: var(--accent-2);
+  --ring-width: 2px;
+  --ring-offset: 2px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --dur-fast: 0.15s;
+  --dur: 0.25s;
+  --dur-slow: 0.5s;
+
+  /* Layout */
+  --nav-h: 64px;
+  --container: 1100px;
+  --container-narrow: 660px;
+  /* One gutter shared by the navbar and every section, so the logo and the
+     section content sit on the same left edge instead of drifting apart. */
+  --gutter: clamp(1.5rem, 5vw, 3rem);
+
+  /* Fluid type scale */
+  --step--1: clamp(0.75rem, 0.72rem + 0.15vw, 0.82rem);
+  --step-0: clamp(0.9rem, 0.87rem + 0.18vw, 0.97rem);
+  --step-1: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+  --step-2: clamp(1.3rem, 1.15rem + 0.75vw, 1.75rem);
+  --step-3: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+  --step-4: clamp(3rem, 1.8rem + 6vw, 6.5rem);
 }
+
+/* Expose tokens to Tailwind v4 utilities (bg-surface, text-muted, font-mono, ...) */
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-primary: var(--text-primary);
+  --color-muted: var(--text-muted);
+  --color-subtle: var(--text-subtle);
+  --color-accent-1: var(--accent-1);
+  --color-accent-2: var(--accent-2);
+  --color-accent-3: var(--accent-3);
+  --color-accent-4: var(--accent-4);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+}
+
+/* Note: the font families deliberately stay out of @theme. next/font already
+   defines --font-inter and --font-mono on <html>, so re-declaring them here as
+   `--font-mono: var(--font-mono), ...` would be a self-referential custom
+   property. Use the `.mono` helper below (or var(--font-mono) directly)
+   instead of Tailwind's font-* utilities. */
+
+/* ============================================================
+   Base
+
+   Everything from here down lives in @layer base / @layer components.
+   That matters: `@import "tailwindcss"` puts its utilities in a layer,
+   and UNLAYERED css beats layered css regardless of specificity. An
+   unlayered universal reset that zeroes padding therefore silently
+   overrode every Tailwind padding and margin utility on the page —
+   p-7 computed to 0px. Layering these restores "utilities win".
+   ============================================================ */
+@layer base {
 
 * {
   box-sizing: border-box;
@@ -23,52 +127,597 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
 }
 
 body {
   background-color: var(--background);
   color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--step-0);
+  line-height: 1.6;
   overflow-x: hidden;
+  text-wrap: pretty;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+  line-height: 1.1;
 }
 
 section {
-  scroll-margin-top: 64px;
+  scroll-margin-top: var(--nav-h);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--background); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent-1); }
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
 
-/* Selection */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* ============================================================
+   Focus. Every interactive element gets a visible ring;
+   keyboard users previously had no affordance at all.
+   ============================================================ */
+:focus-visible {
+  outline: var(--ring-width) solid var(--ring);
+  outline-offset: var(--ring-offset);
+  border-radius: 1px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: var(--ring-width) solid var(--ring);
+  outline-offset: var(--ring-offset);
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 200;
+  background: var(--accent-1);
+  color: #ffffff;
+  padding: 0.75rem 1.25rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8rem;
+}
+
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   Scrollbar
+   ============================================================ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) var(--background);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border: 3px solid var(--background);
+  border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-1);
+}
+
 ::selection {
   background: var(--accent-1);
-  color: var(--text-primary);
+  color: #ffffff;
 }
 
-/* Section base */
+} /* end @layer base */
+
+/* ============================================================
+   Layout primitives
+   ============================================================ */
+@layer components {
 .section {
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
+  min-height: 100svh;
+  /* Grows past the viewport when the content needs it. It used to be a hard
+     100vh box with overflow:hidden, which silently clipped the taller sections
+     (Stack ran 1094px inside a 914px viewport). */
+  overflow-x: clip;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
+  padding-block: clamp(3.5rem, 6vh, 5rem);
   background-color: var(--background);
   z-index: 1;
 }
 
-/* Flat card */
-.flat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+.shell {
+  width: 100%;
+  max-width: calc(var(--container) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
 }
 
-/* Gradient text */
+/* Navbar inner shell — same max-width and gutter as .container so the
+   <kuroe/> logo aligns with each section's left edge. */
+.nav-shell {
+  width: 100%;
+  max-width: calc(var(--container) + var(--gutter) * 2);
+  height: 100%;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* ============================================================
+   Editorial section header
+
+   Replaces the centred "label over gradient headline" that every
+   section repeated. Left-aligned, with an oversized outlined index
+   and a rule, so the sections read as a numbered sequence.
+   ============================================================ */
+.section-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: clamp(0.9rem, 2.5vw, 2rem);
+  width: 100%;
+  margin-bottom: clamp(1.5rem, 3.5vw, 2.25rem);
+}
+
+.section-index {
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--border-strong);
+  user-select: none;
+  translate: 0 0.06em;
+}
+
+.section-head .section-label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.section-title {
+  font-size: var(--step-3);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+/* A short, solid accent bar rather than a full-width gradient hairline. The
+   old rule faded to transparent across the whole shell, so it read as a line
+   trailing off into empty space beside the section content. */
+.rule {
+  width: 72px;
+  height: 3px;
+  border: 0;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+}
+
+/* ============================================================
+   Section backdrops
+
+   One base layer plus a pattern modifier, so each section gets its
+   own texture instead of every one repeating the same blueprint grid.
+   ============================================================ */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  mask-image: radial-gradient(ellipse 75% 60% at 50% 45%, #000 20%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 45%, #000 20%, transparent 100%);
+}
+
+/* Blueprint grid */
+.backdrop-grid {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Dot matrix */
+.backdrop-dots {
+  background-image: radial-gradient(var(--border-strong) 1.2px, transparent 1.2px);
+  background-size: 26px 26px;
+}
+
+/* Diagonal hatching */
+.backdrop-diagonal {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--border) 0 1px,
+    transparent 1px 16px
+  );
+}
+
+/* Concentric rings, echoing the orbit rings in the 3D scene */
+.backdrop-rings {
+  background-image: repeating-radial-gradient(
+    circle at 50% 50%,
+    transparent 0 46px,
+    var(--border) 46px 47px
+  );
+  opacity: 0.28;
+}
+
+/* Soft accent bloom — no repeating geometry at all */
+.backdrop-bloom {
+  opacity: 0.55;
+  background-image:
+    radial-gradient(ellipse 55% 45% at 18% 25%, var(--accent-1-a20), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 82% 72%, var(--accent-2-a10), transparent 70%);
+}
+
+/* Kept so any stale usage still renders the grid */
+.grid-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 75% 60% at 50% 45%, #000 20%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 45%, #000 20%, transparent 100%);
+}
+
+/* ============================================================
+   Surfaces
+   ============================================================ */
+.flat-card,
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+}
+
+.card-interactive {
+  transition:
+    border-color var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
+}
+
+.card-interactive:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+
+/* Corner brackets — a terminal/HUD cue that gives the flat boxes an
+   identity without adding fills or shadows. */
+.card-bracket {
+  position: relative;
+}
+
+.card-bracket::before,
+.card-bracket::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--accent-1);
+  pointer-events: none;
+  transition: border-color var(--dur) var(--ease-out);
+}
+
+.card-bracket::before {
+  top: -1px;
+  left: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.card-bracket::after {
+  right: -1px;
+  bottom: -1px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.card-bracket:hover::before,
+.card-bracket:hover::after {
+  border-color: var(--accent-2);
+}
+
+/* Left accent spine, for list/stat blocks */
+.spine {
+  border-left: 2px solid var(--accent-1);
+  padding-left: 1rem;
+}
+
+/* Stat block */
+.stat-value {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  margin-top: 0.4rem;
+}
+
+/* ============================================================
+   Controls
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+.btn-primary {
+  background: var(--accent-1);
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-2);
+  color: #191825;
+}
+
+.btn-ghost {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--surface-2);
+  border-color: var(--accent-1);
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out);
+}
+
+.icon-btn:hover:not(:disabled) {
+  background: var(--accent-1);
+  border-color: var(--accent-1);
+  color: #ffffff;
+}
+
+/* Navbar links */
+.nav-link {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-subtle);
+  transition: color var(--dur) var(--ease-out);
+}
+
+.nav-link:hover,
+.nav-link[aria-current="true"] {
+  color: var(--text-primary);
+}
+
+.nav-link-mobile {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  text-align: left;
+  padding: 0.75rem 0;
+  font-size: 1rem;
+  color: var(--text-subtle);
+  transition: color var(--dur) var(--ease-out);
+}
+
+.nav-link-mobile:hover,
+.nav-link-mobile[aria-current="true"] {
+  color: var(--accent-1);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.73rem;
+  text-decoration: none;
+  transition:
+    background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out);
+}
+
+/* Tinted chip. Set --chip-color on the element; hover is pure CSS so the
+   components no longer need a pair of JS mouse handlers per chip. */
+.chip-accent {
+  background: color-mix(in srgb, var(--chip-color) 12%, transparent);
+  border-color: color-mix(in srgb, var(--chip-color) 30%, transparent);
+  color: #d1d5db;
+}
+
+.chip-accent:hover {
+  background: var(--chip-color);
+  border-color: var(--chip-color);
+  color: #191825;
+}
+
+/* ============================================================
+   Form fields
+   ============================================================ */
+.field {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.625rem 0.875rem;
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  outline: none;
+  transition:
+    border-color var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out);
+}
+
+.field::placeholder {
+  color: var(--text-subtle);
+}
+
+.field:hover:not(:disabled) {
+  border-color: var(--border-strong);
+}
+
+.field:focus {
+  border-color: var(--accent-1);
+  background: var(--surface-2);
+}
+
+.field:focus-visible {
+  outline: var(--ring-width) solid var(--ring);
+  outline-offset: 1px;
+}
+
+.field[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.field:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.field-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--accent-1);
+  text-transform: uppercase;
+}
+
+.field-error {
+  font-size: 0.72rem;
+  color: var(--danger);
+  font-family: var(--font-mono), monospace;
+}
+
+/* Honeypot: off-screen and never focusable by keyboard */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ============================================================
+   Type helpers
+   ============================================================ */
 .gradient-text-accent {
   background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
   -webkit-background-clip: text;
@@ -76,45 +725,175 @@ section {
   background-clip: text;
 }
 
-/* Section label */
 .section-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.75rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--accent-2);
-  opacity: 0.9;
 }
 
-/* Float animation */
+.section-heading {
+  font-size: var(--step-3);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.section-lede {
+  color: var(--text-muted);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  max-width: 60ch;
+}
+
+.mono {
+  font-family: var(--font-mono), monospace;
+}
+
+} /* end @layer components */
+
+/* ============================================================
+   Animations
+   ============================================================ */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(5deg); }
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
 }
 
-.float { animation: float 3s ease-in-out infinite; }
-.float-slow { animation: float-slow 6s ease-in-out infinite; }
+.float {
+  animation: float 3s ease-in-out infinite;
+}
 
-/* Cursor blink */
+.float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
-.cursor-blink { animation: blink 1s step-end infinite; }
 
-/* Ink splash easter egg */
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* "Available for work" status dot */
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 var(--accent-2-a40);
+  }
+  50% {
+    opacity: 0.75;
+    box-shadow: 0 0 0 4px transparent;
+  }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2.4s var(--ease-out) infinite;
+}
+
 @keyframes ink-spread {
-  0% { transform: scale(0); opacity: 1; }
-  100% { transform: scale(3); opacity: 0; }
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
 }
 
-/* Scan line effect */
 @keyframes scan {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface) 25%,
+    var(--surface-2) 50%,
+    var(--surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* ============================================================
+   Reduced motion. This site is motion-heavy (Lenis smooth scroll,
+   scroll-linked transforms, 3D canvases, clip-path curtains), so
+   honour the OS setting rather than overriding it.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .float,
+  .float-slow,
+  .cursor-blink,
+  .pulse-dot,
+  .skeleton,
+  .spin {
+    animation: none !important;
+  }
+
+  .card-interactive:hover {
+    transform: none;
+  }
 }

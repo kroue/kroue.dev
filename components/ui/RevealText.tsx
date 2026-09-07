@@ -54,7 +54,10 @@ export default function RevealText({
     },
   };
 
-  const MotionTag = motion[elementType as keyof typeof motion] as any;
+  // Indexing `motion` with a union collapses the props to `never`, so pin the
+  // props to motion.div's — every allowed elementType takes the same HTML
+  // attributes we pass here.
+  const MotionTag = motion[elementType] as typeof motion.div;
 
   const isCentered = className.includes("text-center");
   const isRight = className.includes("text-right");
@@ -67,6 +70,10 @@ export default function RevealText({
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-10%" }}
+      /* Splitting into per-word spans leaves no whitespace between them, so
+         the accessible name came out as "CraftedbyCuriosity.RefinedbyCode."
+         Label the element with the real string and hide the pieces. */
+      aria-label={text}
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -76,7 +83,11 @@ export default function RevealText({
       }}
     >
       {words.map((word, idx) => (
-        <span key={idx} style={{ display: "inline-block", overflow: "hidden" }}>
+        <span
+          key={idx}
+          aria-hidden="true"
+          style={{ display: "inline-block", overflow: "hidden" }}
+        >
           <motion.span
             variants={child}
             style={{ display: "inline-block", marginRight: "0.25em" }}

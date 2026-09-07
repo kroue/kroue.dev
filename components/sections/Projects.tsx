@@ -1,172 +1,226 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { motion, useInView, AnimatePresence, useScroll, useTransform, Variants } from "framer-motion";
-import RevealText from "@/components/ui/RevealText";
+import { useRef, useState } from "react";
+import {
+  motion,
+  useInView,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+  Variants,
+} from "framer-motion";
+import {
+  FaGithub,
+  FaArrowUpRightFromSquare,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa6";
 import ShapeTransition from "@/components/ui/ShapeTransition";
+import SectionHeader from "@/components/ui/SectionHeader";
 import TechIcon from "@/components/ui/TechIcon";
 import { projects, Project } from "@/lib/projects";
 
-const COLOR_MAP = {
-  cyan: {
-    border: "#865DFF",
-    glow: "#865DFF",
-    tag: "rgba(134,93,255,0.1)",
-    tagBorder: "rgba(134,93,255,0.3)",
-    tagText: "#865DFF",
-    gradient: "#865DFF",
-  },
-  gold: {
-    border: "#E384FF",
-    glow: "#E384FF",
-    tag: "rgba(227,132,255,0.1)",
-    tagBorder: "rgba(227,132,255,0.3)",
-    tagText: "#E384FF",
-    gradient: "#E384FF",
-  },
-  purple: {
-    border: "#FFA3FD",
-    glow: "#FFA3FD",
-    tag: "rgba(255,163,253,0.1)",
-    tagBorder: "rgba(255,163,253,0.3)",
-    tagText: "#FFA3FD",
-    gradient: "#FFA3FD",
-  },
+/** One base colour per accent key; tints are derived rather than hand-written. */
+const ACCENT: Record<Project["color"], string> = {
+  cyan: "#865DFF",
+  gold: "#E384FF",
+  purple: "#FFA3FD",
 };
 
-function ProjectCard({ project }: { project: Project }) {
-  const [hovered, setHovered] = useState(false);
-  const colors = COLOR_MAP[project.color];
+const tint = (color: string, percent: number) =>
+  `color-mix(in srgb, ${color} ${percent}%, transparent)`;
+
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const accent = ACCENT[project.color];
+
+  const linkStyle: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 38,
+    height: 38,
+    flexShrink: 0,
+    border: `1px solid ${tint(accent, 45)}`,
+    background: tint(accent, 12),
+    color: accent,
+    textDecoration: "none",
+    transition: "background-color var(--dur), color var(--dur)",
+  };
+
+  const onLinkEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.currentTarget.style.background = accent;
+    e.currentTarget.style.color = "#191825";
+  };
+  const onLinkLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.currentTarget.style.background = tint(accent, 12);
+    e.currentTarget.style.color = accent;
+  };
 
   return (
-    <div
-      className="flat-card rounded-none overflow-hidden h-full flex flex-col justify-between"
+    <article
+      className="card card-bracket h-full flex flex-col justify-between relative overflow-hidden"
       style={{
-        border: `1px solid ${colors.border}40`,
-        padding: "1.75rem 2rem",
+        borderColor: tint(accent, 35),
+        padding: "2rem 2.25rem",
         minHeight: 340,
-        background: "var(--surface)",
+        // Accent bleeds in from the top-left corner instead of sitting as a
+        // flat bar, so the card reads as part of the section rather than a box.
+        backgroundImage: `radial-gradient(ellipse 60% 90% at 0% 0%, ${tint(accent, 12)}, transparent 70%)`,
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
-      <div>
-        {/* Card top accent line */}
-        <div
-          style={{
-            height: 3,
-            background: colors.gradient,
-            transition: "opacity 0.3s",
-            opacity: hovered ? 1 : 0.6,
-            marginBottom: "1.25rem",
-            borderRadius: "2px",
-          }}
-        />
+      {/* Oversized ghost index, echoing the section marker */}
+      <span
+        aria-hidden="true"
+        className="mono absolute select-none"
+        style={{
+          top: "0.75rem",
+          right: "1.25rem",
+          fontSize: "clamp(3.5rem, 9vw, 6rem)",
+          fontWeight: 800,
+          lineHeight: 0.8,
+          letterSpacing: "-0.05em",
+          color: "transparent",
+          WebkitTextStroke: `1.5px ${tint(accent, 22)}`,
+        }}
+      >
+        {String(index + 1).padStart(2, "0")}
+      </span>
 
-        {/* Header */}
+      <div className="relative">
         <div className="flex items-start justify-between gap-4 mb-3">
           <div>
             <h3
-              style={{
-                fontSize: "1.4rem",
-                fontWeight: 700,
-                color: "#f0eeee",
-                marginBottom: "0.2rem",
-              }}
+              className="font-bold mb-1"
+              style={{ fontSize: "var(--step-2)", letterSpacing: "-0.02em" }}
             >
               {project.title}
             </h3>
             <p
-              style={{
-                fontFamily: "JetBrains Mono, monospace",
-                fontSize: "0.74rem",
-                color: colors.tagText,
-                letterSpacing: "0.05em",
-              }}
+              className="mono flex items-center gap-2 flex-wrap"
+              style={{ fontSize: "0.74rem", color: accent, letterSpacing: "0.05em" }}
             >
               {project.tagline}
+              {project.client && (
+                <span
+                  style={{
+                    fontSize: "0.62rem",
+                    letterSpacing: "0.12em",
+                    padding: "2px 7px",
+                    border: `1px solid ${tint(accent, 45)}`,
+                    background: tint(accent, 12),
+                  }}
+                >
+                  CLIENT WORK
+                </span>
+              )}
             </p>
           </div>
 
-          {/* GitHub Link */}
-          {project.github && (
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="View GitHub Repository"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 38,
-                height: 38,
-                borderRadius: 6,
-                border: `1px solid ${colors.border}50`,
-                color: colors.tagText,
-                transition: "all 0.2s",
-                background: `${colors.border}15`,
-                fontSize: "1.1rem",
-                textDecoration: "none",
-                flexShrink: 0,
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "#191825";
-                (e.currentTarget as HTMLElement).style.background = colors.border;
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.color = colors.tagText;
-                (e.currentTarget as HTMLElement).style.background = `${colors.border}15`;
-              }}
-            >
-              ⌥
-            </a>
-          )}
         </div>
 
-        {/* Description */}
         <p
           style={{
             color: "var(--text-muted)",
             fontSize: "0.92rem",
             lineHeight: 1.65,
-            marginBottom: "1.5rem",
+            marginBottom: project.highlights ? "1rem" : "1.5rem",
           }}
         >
           {project.description}
         </p>
+
+        {/* Concrete outcomes from the résumé, kept as a scannable strip */}
+        {project.highlights && (
+          <ul className="flex flex-col gap-1.5 list-none mb-5">
+            {project.highlights.map((item) => (
+              <li
+                key={item}
+                className="flex gap-2.5"
+                style={{
+                  color: "var(--text-subtle)",
+                  fontSize: "0.82rem",
+                  lineHeight: 1.55,
+                }}
+              >
+                <span aria-hidden="true" style={{ color: accent, flexShrink: 0 }}>
+                  ▸
+                </span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      {/* Tech Stack Logos Only */}
-      <div className="flex flex-wrap items-center gap-2.5 pt-4 border-t border-[rgba(255,255,255,0.06)]">
-        {project.tags.map((tag) => (
-          <div
-            key={tag}
-            title={tag}
-            className="inline-flex items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer"
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: 8,
-              background: colors.tag,
-              border: `1px solid ${colors.tagBorder}`,
-              color: colors.tagText,
-            }}
-          >
-            <TechIcon name={tag} size={18} />
-          </div>
-        ))}
+      {/* Footer: tech stack left, repo/live links right.
+          The links used to sit top-right, where the oversized ghost index
+          number overlapped them. */}
+      <div
+        className="pt-4 flex items-end justify-between gap-4 flex-wrap"
+        style={{ borderTop: "1px solid var(--border-subtle)" }}
+      >
+        <div className="min-w-0">
+          <h4 className="sr-only">Built with</h4>
+          <ul className="flex flex-wrap items-center gap-2.5 list-none">
+            {project.tags.map((tag) => (
+              <li
+                key={tag}
+                title={tag}
+                className="inline-flex items-center justify-center transition-transform duration-200 hover:scale-110"
+                style={{
+                  width: 34,
+                  height: 34,
+                  background: tint(accent, 12),
+                  border: `1px solid ${tint(accent, 35)}`,
+                  color: accent,
+                }}
+              >
+                <TechIcon name={tag} size={18} />
+                <span className="sr-only">{tag}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {project.live && (
+            <a
+              href={project.live}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Open the live ${project.title} site (opens in a new tab)`}
+              title="Live site"
+              style={linkStyle}
+              onMouseEnter={onLinkEnter}
+              onMouseLeave={onLinkLeave}
+            >
+              <FaArrowUpRightFromSquare size={15} aria-hidden="true" />
+            </a>
+          )}
+          {project.github && (
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`View the ${project.title} repository on GitHub (opens in a new tab)`}
+              title="GitHub repository"
+              style={linkStyle}
+              onMouseEnter={onLinkEnter}
+              onMouseLeave={onLinkLeave}
+            >
+              <FaGithub size={17} aria-hidden="true" />
+            </a>
+          )}
+        </div>
       </div>
-    </div>
+    </article>
   );
 }
 
 export default function Projects() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
-  const lastWheelTime = useRef(0);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0); // -1 for prev, 1 for next
+  const [direction, setDirection] = useState(0); // -1 back, 1 forward
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -174,26 +228,30 @@ export default function Projects() {
   });
 
   const opacity = useTransform(scrollYProgress, [0, 0.4, 0.6, 1], [0, 1, 1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.4, 0.6, 1], [0.85, 1, 1, 0.9]);
   const inView = useInView(containerRef, { once: false, margin: "-80px" });
 
-  const totalProjects = projects.length;
-  const nextSlide = () => {
-    setDirection(1);
-    setCurrentIndex((prev) => (prev + 1) % totalProjects);
+  const total = projects.length;
+
+  const goTo = (index: number, dir: number) => {
+    setDirection(dir);
+    setCurrentIndex((index + total) % total);
   };
 
-  const prevSlide = () => {
-    setDirection(-1);
-    setCurrentIndex((prev) => (prev - 1 + totalProjects) % totalProjects);
+  const nextSlide = () => goTo(currentIndex + 1, 1);
+  const prevSlide = () => goTo(currentIndex - 1, -1);
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      nextSlide();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      prevSlide();
+    }
   };
 
   const slideVariants: Variants = {
-    enter: (dir: number) => ({
-      x: dir > 0 ? 300 : -300,
-      opacity: 0,
-      scale: 0.95,
-    }),
+    enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0, scale: 0.95 }),
     center: {
       x: 0,
       opacity: 1,
@@ -211,185 +269,127 @@ export default function Projects() {
   const activeProject = projects[currentIndex];
 
   return (
-    <section
-      id="projects"
-      className="section scroll-mt-16"
-      ref={containerRef}
-    >
-      <ShapeTransition color="var(--accent-3)" direction="down" delay={0.2}>
-        <motion.div style={{ opacity, scale }} className="w-full h-full flex flex-col items-center justify-center">
-          <div className="relative z-10 w-full px-6 mx-auto" style={{ maxWidth: 1100 }}>
-            {/* Section Header */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.5 }}
-              className="section-label mb-3 text-center"
-            >
-              // featured showcase
-            </motion.div>
+    <section id="projects" className="section scroll-mt-16" ref={containerRef}>
+      <div className="backdrop backdrop-grid" aria-hidden="true" />
 
-            <RevealText
-              text="Featured Projects."
-              elementType="h2"
-              delay={0.2}
-              className="text-center font-bold mb-4 gradient-text-accent"
-              style={{
-                fontSize: "clamp(2rem, 5vw, 3.5rem)",
-                lineHeight: 1.1,
-              }}
+      <ShapeTransition color="var(--accent-3)" direction="blinds" delay={0.2}>
+        <motion.div
+          style={{ opacity }}
+          className="w-full flex flex-col items-center justify-center"
+        >
+
+          <div className="shell relative z-10">
+            <SectionHeader
+              index="04"
+              label="// featured showcase"
+              title="Featured Projects."
+              lede="Open-source applications, client deliverables, and system architectures on GitHub."
+              inView={inView}
+              accent="var(--accent-3)"
             />
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              style={{
-                color: "var(--text-muted)",
-                fontSize: "0.97rem",
-                marginBottom: "3.5rem",
-                textAlign: "center",
-                maxWidth: 600,
-                margin: "0 auto 3.5rem",
-              }}
-            >
-              Open-source applications, client deliverables, and system architectures on GitHub.
-            </motion.p>
-
-            {/* Carousel Controls Header */}
-            <div className="flex items-center justify-between mb-6 px-1">
-              <div
-                style={{
-                  fontFamily: "JetBrains Mono, monospace",
-                  fontSize: "0.85rem",
-                  color: "var(--text-muted)",
-                  letterSpacing: "0.1em",
-                }}
-              >
-                PROJECT <span style={{ color: "var(--accent-1)", fontWeight: 700 }}>{String(currentIndex + 1).padStart(2, "0")}</span> / {String(totalProjects).padStart(2, "0")}
-              </div>
-
-              {/* Prev / Next Arrows */}
-              <div className="flex gap-3">
-                <button
-                  onClick={prevSlide}
-                  aria-label="Previous Project"
-                  className="flex items-center justify-center cursor-pointer transition-all duration-200"
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 6,
-                    border: "1px solid var(--border)",
-                    background: "var(--surface)",
-                    color: "var(--text-primary)",
-                    fontSize: "1.1rem",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-1)";
-                    (e.currentTarget as HTMLElement).style.background = "var(--accent-1)";
-                    (e.currentTarget as HTMLElement).style.color = "#191825";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
-                    (e.currentTarget as HTMLElement).style.background = "var(--surface)";
-                    (e.currentTarget as HTMLElement).style.color = "var(--text-primary)";
-                  }}
-                >
-                  ←
-                </button>
-                <button
-                  onClick={nextSlide}
-                  aria-label="Next Project"
-                  className="flex items-center justify-center cursor-pointer transition-all duration-200"
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 6,
-                    border: "1px solid var(--border)",
-                    background: "var(--surface)",
-                    color: "var(--text-primary)",
-                    fontSize: "1.1rem",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-1)";
-                    (e.currentTarget as HTMLElement).style.background = "var(--accent-1)";
-                    (e.currentTarget as HTMLElement).style.color = "#191825";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
-                    (e.currentTarget as HTMLElement).style.background = "var(--surface)";
-                    (e.currentTarget as HTMLElement).style.color = "var(--text-primary)";
-                  }}
-                >
-                  →
-                </button>
-              </div>
-            </div>
-
-            {/* Carousel Container */}
+            {/* Carousel */}
             <div
-              ref={carouselRef}
-              className="relative overflow-hidden w-full min-h-[360px] flex items-center justify-center"
+              role="group"
+              aria-roledescription="carousel"
+              aria-label="Featured projects"
+              tabIndex={0}
+              onKeyDown={onKeyDown}
+              className="w-full"
             >
-              <AnimatePresence initial={false} custom={direction} mode="wait">
-                <motion.div
-                  key={currentIndex}
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  className="w-full"
+              <div className="flex items-center justify-between gap-4 mb-5">
+                <p
+                  className="mono"
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "var(--text-muted)",
+                    letterSpacing: "0.1em",
+                  }}
                 >
-                  <ProjectCard project={activeProject} />
-                </motion.div>
-              </AnimatePresence>
-            </div>
+                  PROJECT{" "}
+                  <span style={{ color: "var(--accent-1)", fontWeight: 700 }}>
+                    {String(currentIndex + 1).padStart(2, "0")}
+                  </span>{" "}
+                  / {String(total).padStart(2, "0")}
+                  <span className="sr-only"> — use the arrow keys to browse</span>
+                </p>
 
-            {/* Indicator Dots & GitHub CTA with clear gap */}
-            <div className="flex flex-col items-center gap-10 mt-12">
-              {/* Indicator Dots */}
-              <div className="flex items-center justify-center gap-3">
-                {projects.map((p, idx) => (
+                <div className="flex gap-3">
                   <button
-                    key={p.id}
-                    onClick={() => {
-                      setDirection(idx > currentIndex ? 1 : -1);
-                      setCurrentIndex(idx);
-                    }}
-                    aria-label={`Go to project ${p.title}`}
+                    type="button"
+                    onClick={prevSlide}
+                    aria-label="Previous project"
+                    aria-controls="project-slide"
+                    className="icon-btn"
+                  >
+                    <FaChevronLeft size={15} aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={nextSlide}
+                    aria-label="Next project"
+                    aria-controls="project-slide"
+                    className="icon-btn"
+                  >
+                    <FaChevronRight size={15} aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+
+              <div
+                id="project-slide"
+                aria-live="polite"
+                className="relative overflow-hidden w-full min-h-[360px] flex items-center justify-center"
+              >
+                <AnimatePresence initial={false} custom={direction} mode="wait">
+                  <motion.div
+                    key={currentIndex}
+                    custom={direction}
+                    variants={slideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    className="w-full"
+                  >
+                    <ProjectCard project={activeProject} index={currentIndex} />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Pagination */}
+              <div className="flex items-center justify-center gap-3 mt-10">
+                {projects.map((project, idx) => (
+                  <button
+                    key={project.id}
+                    type="button"
+                    onClick={() => goTo(idx, idx > currentIndex ? 1 : -1)}
+                    aria-label={`Show ${project.title}`}
+                    aria-current={idx === currentIndex ? "true" : undefined}
                     className="cursor-pointer transition-all duration-200"
                     style={{
                       width: idx === currentIndex ? 32 : 10,
                       height: 10,
-                      borderRadius: 5,
-                      background: idx === currentIndex ? "var(--accent-1)" : "var(--border)",
+                      borderRadius: "var(--radius-pill)",
+                      background:
+                        idx === currentIndex ? "var(--accent-1)" : "var(--border)",
                       border: "none",
                     }}
                   />
                 ))}
               </div>
+            </div>
 
-              {/* GitHub CTA Button */}
-              <div>
-                <a
-                  href="https://github.com/kroue"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-none transition-all duration-200 hover:scale-105"
-                  style={{
-                    border: "1px solid var(--border)",
-                    color: "var(--text-primary)",
-                    fontSize: "0.9rem",
-                    fontFamily: "JetBrains Mono, monospace",
-                    background: "var(--surface)",
-                    textDecoration: "none",
-                    padding: "12px 24px",
-                  }}
-                >
-                  <span>⌥</span> Explore All Repositories on GitHub
-                </a>
-              </div>
+            <div className="flex justify-center mt-10">
+              <a
+                href="https://github.com/kroue"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-ghost mono"
+                style={{ fontSize: "0.9rem" }}
+              >
+                <FaGithub size={16} aria-hidden="true" />
+                Explore All Repositories on GitHub
+              </a>
             </div>
           </div>
         </motion.div>

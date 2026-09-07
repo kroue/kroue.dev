@@ -4,28 +4,89 @@ export interface Project {
   tagline: string;
   description: string;
   tags: string[];
-  github: string;
+  github?: string;
   live?: string;
   color: "cyan" | "gold" | "purple";
+  /** Headline result, shown as a mono metric strip on the card. */
+  highlights?: string[];
+  /** Shipped for a paying client rather than coursework. */
+  client?: boolean;
 }
 
 export const projects: Project[] = [
   {
+    id: "meedo",
+    title: "MEEDO",
+    tagline: "Water Utility Billing Platform — Android + Web",
+    description:
+      "Offline-first field app for meter readers paired with a web admin console. Readings are recorded anywhere on route with no signal, an itemized bill prints on the spot over a Bluetooth thermal printer, and everything syncs once back in coverage.",
+    tags: ["Kotlin", "Jetpack Compose", "Next.js", "React", "TypeScript", "Firebase"],
+    color: "gold",
+    client: true,
+    highlights: [
+      "Background sync via WorkManager with exponential back-off (30s → 5min cap)",
+      "Per-reading PENDING/SYNCED/FAILED state — flaky signal degrades throughput, never loses data",
+      "Board-approved rate card encoded as a pure, unit-testable billing engine",
+    ],
+  },
+  {
     id: "inventrack",
     title: "InvenTrack",
-    tagline: "Inventory & Stock Tracking System",
+    tagline: "Point-of-Sale & Inventory Platform",
     description:
-      "A comprehensive inventory management system designed for tracking stock levels, product movements, and supply chain updates efficiently with real-time tracking.",
-    tags: ["React", "TypeScript", "Tailwind CSS", "PostgreSQL"],
+      "Batch and expiry tracking with automated reorder-point forecasting from sales velocity, plus a procurement workflow spanning restock requests through purchase orders to delivery receipt.",
+    tags: ["Angular", "TypeScript", "Supabase", "PostgreSQL", "Tailwind CSS"],
     color: "cyan",
+    client: true,
     github: "https://github.com/kroue/inventrack",
+    highlights: [
+      "Service workers and a client-side sync queue keep cashiers selling through outages",
+      "Role-based access enforced with row-level security policies",
+      "Automated low-stock and near-expiry alerts replaced manual daily stock checks",
+    ],
+  },
+  {
+    id: "licensure",
+    title: "LiCEnSURE",
+    tagline: "ML Decision-Support System — USTP",
+    description:
+      "Forecasts Civil Engineering licensure exam outcomes so staff can intervene early. Random Forest with SMOTE for class imbalance, tuned via RandomizedSearchCV, with SHAP surfacing per-student feature contributions so results are explainable rather than a black box.",
+    tags: ["Python", "FastAPI", "Next.js", "TypeScript", "Firebase"],
+    color: "purple",
+    github: "https://github.com/kroue/licensure",
+    highlights: [
+      "86.12% accuracy · 88.91% recall · 0.9213 ROC AUC",
+      "SHAP TreeExplainer shows why each prediction was made",
+    ],
+  },
+  {
+    id: "nva-go",
+    title: "NVAGo",
+    tagline: "Booking & Point-of-Sale Platform — Capstone",
+    description:
+      "Booking and POS platform for NVA Printing Services, delivered as a full engagement: proposal, functional validation, testing, and technical documentation — for a client originally served as a print designer.",
+    tags: ["React Native", "Expo", "React", "PostgreSQL", "Supabase"],
+    color: "gold",
+    client: true,
+    github: "https://github.com/kroue/nva-go",
+  },
+  {
+    id: "portfolio",
+    title: "Portfolio",
+    tagline: "Personal Site — 3D & Terminal UI",
+    description:
+      "This site. Built with Next.js and React Three Fiber, featuring an interactive 3D scene and a terminal-style interface.",
+    tags: ["Next.js", "React", "TypeScript", "Firebase", "Tailwind CSS"],
+    color: "cyan",
+    github: "https://github.com/kroue",
+    live: "https://kroue-dev.vercel.app",
   },
   {
     id: "lantaw-mobile",
     title: "Lantaw Mobile",
     tagline: "Mobile App — Client Experience",
     description:
-      "Cross-platform mobile application companion for the Lantaw platform, engineered for responsive user experience, touch interactions, and mobile accessibility.",
+      "Cross-platform mobile companion for the Lantaw platform, engineered for responsive user experience, touch interactions, and mobile accessibility.",
     tags: ["React Native", "Expo", "TypeScript", "Firebase"],
     color: "purple",
     github: "https://github.com/kroue/lantaw-mobile",
@@ -39,35 +100,5 @@ export const projects: Project[] = [
     tags: ["Android", "Flutter", "Python", "Firebase"],
     color: "cyan",
     github: "https://github.com/kaizmer/VitalSense-App",
-  },
-  {
-    id: "nva-go",
-    title: "NVAGo",
-    tagline: "Online Ordering & Web POS System — Capstone",
-    description:
-      "A dual-platform printing service workflow solution featuring a React Native mobile ordering app for customers (design file uploads, GCash proof validation, tracking) and a React POS web dashboard for staff & admins.",
-    tags: ["React Native", "Expo", "React", "PostgreSQL", "Supabase"],
-    color: "gold",
-    github: "https://github.com/kroue/nva-go",
-  },
-  {
-    id: "licensure",
-    title: "Licensure Reviewer",
-    tagline: "Exam Preparation & Learning Platform",
-    description:
-      "Interactive licensure examination practice system featuring diagnostic quizzes, progress tracking analytics, and structured study modules.",
-    tags: ["React", "TypeScript", "JavaScript", "HTML5"],
-    color: "purple",
-    github: "https://github.com/kroue/licensure",
-  },
-  {
-    id: "multiplication-app",
-    title: "Multiplication App",
-    tagline: "Interactive Math Practice Tool",
-    description:
-      "Gamified educational web app engineered to build multiplication mastery through adaptive practice problems, instant score feedback, and interactive drills.",
-    tags: ["JavaScript", "HTML5", "CSS3", "Vite"],
-    color: "cyan",
-    github: "https://github.com/kroue/multiplication-app",
   },
 ];
