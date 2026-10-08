@@ -15,6 +15,8 @@ export interface Screen {
 
 const DESKTOP = { device: "desktop", width: 1440, height: 900 } as const;
 const MOBILE = { device: "mobile", width: 780, height: 1688 } as const;
+/** Android design snapshots render at 393dp × 852dp, 2x. */
+const PHONE = { device: "mobile", width: 786, height: 1704 } as const;
 
 export interface Project {
   id: string;
@@ -47,6 +49,117 @@ export const projects: Project[] = [
       "Background sync via WorkManager with exponential back-off, 30s rising to a 5min cap",
       "Per-reading PENDING/SYNCED/FAILED state, so a flaky signal degrades throughput instead of losing data",
       "Board-approved rate card encoded as a pure, unit-testable billing engine",
+    ],
+    // Console pages are limited to ones that show no resident or staff
+    // record. The field app screens are its own Roborazzi design snapshots,
+    // rendered from test fixtures, so no resident's record appears there.
+    screens: [
+      {
+        ...DESKTOP,
+        src: "/projects/meedo/console-01-dashboard.webp",
+        caption: "Admin dashboard",
+        surface: "Web admin console",
+        alt: "MEEDO admin console overview: total collections, active accounts, delinquency rate and outstanding balance, above a monthly chart of water consumption against revenue billed.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/meedo/console-02-collections-report.webp",
+        caption: "Collection summary",
+        surface: "Web admin console",
+        alt: "Reports and analytics: monthly water sales by rate tier as stacked bars, a donut of all-time sales by tier, and a collection performance table of accounts, billed, collected and collection rate per tier.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/meedo/console-03-consumption.webp",
+        caption: "Consumption analysis",
+        surface: "Web admin console",
+        alt: "Consumption analysis: accounts bucketed by their latest month's usage as an area chart, with a bar breakdown of each consumption bracket.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/meedo/console-04-water-rates.webp",
+        caption: "Water rates",
+        surface: "Web admin console",
+        alt: "Settings page with per-PC options and the water rates in force: the charge per cubic metre past the first ten, and the minimum charge for residential, government, and two commercial classes.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/meedo/console-05-import.webp",
+        caption: "Spreadsheet import",
+        surface: "Web admin console",
+        alt: "Import page with a drop zone for an XLSX workbook, a template download, and the expected format of its three sheets: concessionaires, billing history, and connection payments.",
+      },
+      {
+        ...PHONE,
+        src: "/projects/meedo/01-sign-in.webp",
+        caption: "Reader sign-in",
+        surface: "Android field app",
+        alt: "MEEDO Field sign-in screen with the South Wao Water System seal, a username and password form, and a note that the office creates reader accounts.",
+      },
+      {
+        ...PHONE,
+        src: "/projects/meedo/02-pick-route.webp",
+        caption: "Pick today's route",
+        surface: "Android field app",
+        alt: "Home screen for the September 2026 billing cycle: a sync button with everything uploaded, then the three barangays assigned to this reader, each with its billing due date.",
+      },
+      {
+        ...PHONE,
+        src: "/projects/meedo/03-route-ready.webp",
+        caption: "Route synced, ready offline",
+        surface: "Android field app",
+        alt: "Home screen with Bo-ot as the route being read, three readings waiting to upload, and a confirmation that 142 households were synced to the phone for offline use.",
+      },
+      {
+        ...PHONE,
+        src: "/projects/meedo/04-find-household.webp",
+        caption: "Find a household",
+        surface: "Android field app",
+        alt: "Route progress at 57 of 142 read, and a search for dela cruz listing matching households by name, account, meter number and purok, with the ones already read marked.",
+      },
+      {
+        ...PHONE,
+        src: "/projects/meedo/05-meter-reading.webp",
+        caption: "Meter reading and live bill",
+        surface: "Android field app",
+        alt: "Meter reading form for one household: previous reading, the current reading entered, consumption for the cycle, and the bill computed on the spot with its charges, above Save and Save and print buttons.",
+      },
+      {
+        ...PHONE,
+        height: 3000,
+        src: "/projects/meedo/06-bill.webp",
+        caption: "Itemized bill, before printing",
+        surface: "Android field app",
+        alt: "The full water bill as it prints on the thermal printer: office header, amount due and due date, account and meter details, readings and consumption, each charge, and the total, with a Print receipt button.",
+      },
+      {
+        ...PHONE,
+        src: "/projects/meedo/07-read-twice.webp",
+        caption: "Guard against double billing",
+        surface: "Android field app",
+        alt: "A warning that another reader already billed this household this cycle, explaining that the office will decide which reading stands.",
+      },
+      {
+        ...PHONE,
+        src: "/projects/meedo/08-printer-error.webp",
+        caption: "Printer error, reading kept",
+        surface: "Android field app",
+        alt: "Meter reading screen showing a printer error badge while the reading and bill stay saved, with buttons to move to the next household or view the bill.",
+      },
+      {
+        ...PHONE,
+        src: "/projects/meedo/09-reading-dark.webp",
+        caption: "Dark theme",
+        surface: "Android field app",
+        alt: "The meter reading and bill screen in the dark theme.",
+      },
+      {
+        ...PHONE,
+        src: "/projects/meedo/10-nothing-assigned.webp",
+        caption: "Empty state",
+        surface: "Android field app",
+        alt: "Home screen when the office has not assigned a barangay yet, explaining that assignments appear here automatically.",
+      },
     ],
   },
   {

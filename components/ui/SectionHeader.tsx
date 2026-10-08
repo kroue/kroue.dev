@@ -33,7 +33,9 @@ export default function SectionHeader({
       <motion.span
         aria-hidden="true"
         className="index-huge absolute"
-        style={{ left: "-0.06em", top: "-0.22em", zIndex: 0 }}
+        // Top-aligned with the header rather than hanging above it, where it
+        // ran into the navbar once a section snapped into place.
+        style={{ left: "-0.06em", top: 0, zIndex: 0 }}
         initial={{ opacity: 0, x: -30 }}
         animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
         transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}

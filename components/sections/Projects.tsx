@@ -80,8 +80,8 @@ function ProjectCard({
   const accent = ACCENT[project.color];
   const coverRef = useRef<HTMLButtonElement>(null);
   const screens = project.screens ?? [];
-  const desk = screens.find((s) => s.device === "desktop") ?? screens[0];
-  const phone = screens.find((s) => s.device === "mobile" && s !== desk);
+  const desk = screens.find((s) => s.device === "desktop");
+  const phones = screens.filter((s) => s.device === "mobile");
 
   // The sheet always grows out of the cover when there is one, whichever
   // control was used.
@@ -101,7 +101,7 @@ function ProjectCard({
     transition: "opacity var(--dur) var(--ease-out)",
   };
 
-  const hasAside = Boolean(desk || project.highlights);
+  const hasAside = Boolean(screens.length || project.highlights);
 
   return (
     /* An editorial spread: the numeral overlaps the title, the write-up sits
@@ -115,7 +115,7 @@ function ProjectCard({
         aria-hidden="true"
         className="mono absolute select-none"
         style={{
-          top: "-0.34em",
+          top: 0,
           left: "-0.05em",
           fontSize: "clamp(4.5rem, 13vw, 11rem)",
           fontWeight: 800,
@@ -226,7 +226,7 @@ function ProjectCard({
         </div>
       </div>
 
-      {desk ? (
+      {screens.length > 0 ? (
         /* Pointer shortcut into the case file. It is out of the tab order and
            hidden from assistive tech because "Open case file" is the same
            action, already reachable and named. */
@@ -240,29 +240,41 @@ function ProjectCard({
           onClick={(e) => open(e.currentTarget)}
         >
           <span className="cover-desk">
-            {desk.url && <span className="shot-url">{desk.url}</span>}
+            {desk?.url && <span className="shot-url">{desk.url}</span>}
             <span className="cover-frame">
-              <Image
-                src={desk.src}
-                alt=""
-                fill
-                sizes="(min-width: 1024px) 520px, 100vw"
-                style={{
-                  objectFit: desk.device === "mobile" ? "contain" : "cover",
-                  objectPosition: "top",
-                }}
-              />
+              {desk ? (
+                <Image
+                  src={desk.src}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 520px, 100vw"
+                  style={{ objectFit: "cover", objectPosition: "top" }}
+                />
+              ) : (
+                // A phone-only project fans three of its screens across the
+                // frame rather than letterboxing one inside a desktop shape.
+                <span className="cover-fan">
+                  {phones.slice(0, 3).map((p) => (
+                    <span key={p.src}>
+                      <Image
+                        src={p.src}
+                        alt=""
+                        fill
+                        sizes="150px"
+                        style={{ objectFit: "cover", objectPosition: "top" }}
+                      />
+                    </span>
+                  ))}
+                </span>
+              )}
               <span className="cover-count">{screenCount(screens.length)}</span>
             </span>
           </span>
-          {phone && (
+          {desk && phones[0] && (
             <span className="cover-phone">
-              <span
-                className="shot-frame"
-                style={{ aspectRatio: `${phone.width} / ${phone.height}` }}
-              >
+              <span className="shot-frame" style={{ aspectRatio: "390 / 844" }}>
                 <Image
-                  src={phone.src}
+                  src={phones[0].src}
                   alt=""
                   fill
                   sizes="120px"
@@ -457,7 +469,9 @@ export default function Projects() {
               <div
                 id="project-slide"
                 aria-live="polite"
-                className="relative overflow-hidden w-full min-h-[330px] flex items-center justify-center"
+                // Clipped sideways only, for the slide animation. Clipping
+                // both axes cut the top off the card's numeral.
+                className="relative overflow-x-clip w-full min-h-[330px] flex items-center justify-center"
                 style={{ paddingBottom: "0.75rem", paddingRight: "0.75rem" }}
               >
                 <AnimatePresence initial={false} custom={direction} mode="wait">

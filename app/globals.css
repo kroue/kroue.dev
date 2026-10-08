@@ -272,6 +272,12 @@ textarea:focus-visible,
 @media (min-width: 768px) {
   .section {
     min-height: 100svh;
+    /* Snapping parks a section's top edge at the top of the viewport, under
+       the fixed navbar, so the top padding has to clear the bar or the
+       header numeral is cut off. The bottom gives back what the top takes
+       so a section still fits one screen. */
+    padding-top: calc(var(--nav-h) + clamp(0.75rem, 2vh, 1.5rem));
+    padding-bottom: clamp(1.5rem, 4vh, 3rem);
   }
 }
 
@@ -861,6 +867,30 @@ textarea:focus-visible,
   outline: 6px solid var(--background);
 }
 
+/* Phone-only projects: three captures fanned across the cover frame. */
+.cover-fan {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4%;
+  padding: 5% 6% 0;
+  background: var(--surface-2);
+}
+
+.cover-fan > span {
+  position: relative;
+  flex: 0 0 27%;
+  aspect-ratio: 390 / 844;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+}
+
+.cover-fan > span:nth-child(2) {
+  margin-top: 6%;
+}
+
 .cover-count {
   position: absolute;
   left: 0;
@@ -1014,25 +1044,23 @@ textarea:focus-visible,
   }
 }
 
-/* Phone captures run as a strip at a fixed width instead of being blown
-   up to a desktop column, where a portrait screen would be a metre tall. */
+/* Phone captures sit in their own grid at roughly phone width instead of
+   being blown up to a desktop column, where a portrait screen would be a
+   metre tall. auto-fill keeps one or two of them from stretching. */
 .case-phones {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(190px, 40vw), 1fr));
   gap: clamp(1rem, 2.5vw, 2rem);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  padding-bottom: 0.5rem;
 }
 
 .case-desktops + .case-phones {
   margin-top: clamp(1.25rem, 2.5vw, 2rem);
 }
 
-.case-phones > .shot {
-  flex: none;
-  width: clamp(170px, 46vw, 250px);
-  scroll-snap-align: start;
+@media (min-width: 1024px) {
+  .case-phones {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
 }
 
 .shot-btn {
@@ -1155,6 +1183,11 @@ textarea:focus-visible,
 
 .lightbox-img.is-tall {
   width: min(100%, 1280px);
+  height: auto;
+}
+
+.lightbox-img.is-tall-phone {
+  width: min(100%, 430px);
   height: auto;
 }
 

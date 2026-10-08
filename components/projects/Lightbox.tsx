@@ -29,7 +29,11 @@ export default function Lightbox({
 
   const screen = screens[index];
   const total = screens.length;
-  const kind = isTall(screen) ? "is-tall" : `is-${screen.device}`;
+  const kind = isTall(screen)
+    ? screen.device === "mobile"
+      ? "is-tall-phone"
+      : "is-tall"
+    : `is-${screen.device}`;
 
   useEffect(() => {
     const dialog = dialogRef.current;

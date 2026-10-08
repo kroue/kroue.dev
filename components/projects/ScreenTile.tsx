@@ -6,9 +6,15 @@ import type { Screen } from "@/lib/projects";
 
 export const pad = (n: number) => String(n).padStart(2, "0");
 
-/** A desktop capture much taller than a viewport is a full-page scroll. */
-export const isTall = (screen: Screen) =>
-  screen.device === "desktop" && screen.height / screen.width > 0.8;
+/** The shape of one screen on each device, used to crop tiles and covers. */
+export const SCREEN_RATIO = { desktop: 900 / 1440, mobile: 844 / 390 };
+
+/** How many screens tall a capture is: 1 for a single viewport. */
+export const screensTall = (screen: Screen) =>
+  Math.round(screen.height / screen.width / SCREEN_RATIO[screen.device]);
+
+/** A capture taller than one screen is a full-length scroll. */
+export const isTall = (screen: Screen) => screensTall(screen) > 1;
 
 interface ScreenTileProps {
   screen: Screen;
@@ -22,8 +28,8 @@ interface ScreenTileProps {
 export default function ScreenTile({ screen, number, wide, sizes, onOpen }: ScreenTileProps) {
   const descId = useId();
   const tall = isTall(screen);
-  const ratio =
-    screen.device === "mobile" ? `${screen.width} / ${screen.height}` : "16 / 10";
+  // Tiles crop to one screen; a longer capture shows its top and opens in full.
+  const ratio = screen.device === "mobile" ? "390 / 844" : "16 / 10";
 
   return (
     <figure className={`shot${wide ? " is-wide" : ""}`}>
@@ -52,7 +58,8 @@ export default function ScreenTile({ screen, number, wide, sizes, onOpen }: Scre
           />
           {tall && (
             <span className="shot-badge mono" aria-hidden="true">
-              Full page, {Math.round(screen.height / 900)} screens tall
+              {screen.device === "mobile" ? "Full length" : "Full page"},{" "}
+              {screensTall(screen)} screens tall
             </span>
           )}
         </span>
