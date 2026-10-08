@@ -30,10 +30,10 @@ function Scene() {
   return (
     <>
       <ambientLight intensity={0.1} />
-      <pointLight position={[2, 2, 2]} intensity={1} color="#865DFF" />
-      <Ring radius={0.6} color="#865DFF" speed={0.5} tilt={0.4} />
-      <Ring radius={0.9} color="#E384FF" speed={-0.3} tilt={1.1} />
-      <Ring radius={1.2} color="#FFA3FD" speed={0.2} tilt={-0.7} />
+      <pointLight position={[2, 2, 2]} intensity={1} color="#a58aff" />
+      <Ring radius={0.6} color="#a58aff" speed={0.5} tilt={0.4} />
+      <Ring radius={0.9} color="#ffa3fd" speed={-0.3} tilt={1.1} />
+      <Ring radius={1.2} color="#ffa3fd" speed={0.2} tilt={-0.7} />
     </>
   );
 }

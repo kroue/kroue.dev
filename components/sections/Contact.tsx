@@ -48,7 +48,7 @@ const SOCIAL_PLATFORMS: SocialPlatform[] = [
 ];
 
 const AVAILABILITY = [
-  "Full-stack and mobile roles — remote or Cagayan de Oro",
+  "Full-stack and mobile roles, remote or Cagayan de Oro",
   "Offline-first Android and web platform builds",
   "Freelance client work, proposal through deployment and training",
 ];
@@ -166,8 +166,6 @@ export default function Contact() {
 
   return (
     <section id="contact" className="section scroll-mt-16" ref={containerRef}>
-      <div className="backdrop backdrop-bloom" aria-hidden="true" />
-
       <ShapeTransition color="var(--accent-1)" direction="diagonal" delay={0.2}>
         <motion.div
           style={{ opacity }}
@@ -187,8 +185,8 @@ export default function Contact() {
                 on the right. The old single centred column left a large dead
                 band under the navbar and stacked a redundant card above the
                 form. */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(0,30rem)] gap-10 lg:gap-14 items-start">
-              {/* ---------- Left: pitch, availability, socials ---------- */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(0,30rem)] gap-10 lg:gap-14 items-start md:max-w-2xl md:mx-auto lg:max-w-none lg:mx-0">
+              {/* Left: pitch, availability, socials. */}
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
@@ -196,8 +194,8 @@ export default function Contact() {
                 className="flex flex-col gap-8 min-w-0"
               >
                 <p className="section-lede">
-                  Whether you have a project in mind, a role to fill, or just
-                  want to talk code — my inbox is always open.
+                  Have a project in mind, a role to fill, or just want to talk
+                  code? My inbox is always open.
                 </p>
 
                 <div>
@@ -212,25 +210,21 @@ export default function Contact() {
                   >
                     Currently open for
                   </h3>
-                  <ul className="flex flex-col gap-2.5 list-none">
-                    {AVAILABILITY.map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-start gap-3"
-                        style={{
-                          color: "var(--text-muted)",
-                          fontSize: "0.9rem",
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        <span
-                          aria-hidden="true"
-                          className="mono"
-                          style={{ color: "var(--accent-2)", flexShrink: 0 }}
-                        >
-                          ▸
+                  <ul className="rail">
+                    {AVAILABILITY.map((item, i) => (
+                      <li key={item}>
+                        <span className="rail-num">
+                          {String(i + 1).padStart(2, "0")}
                         </span>
-                        {item}
+                        <span
+                          style={{
+                            color: "var(--text-muted)",
+                            fontSize: "0.88rem",
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {item}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -248,11 +242,11 @@ export default function Contact() {
                   >
                     Find me elsewhere
                   </h3>
-                  <ul className="flex flex-wrap items-center gap-2.5 list-none">
+                  <ul className="flex flex-wrap items-center gap-x-2 gap-y-2 list-none">
                     {SOCIAL_PLATFORMS.map((social) => {
                       const isCopied = copiedId === social.name;
                       const label = social.copyText
-                        ? `Copy ${social.name} — ${social.copyText}`
+                        ? `Copy ${social.name}: ${social.copyText}`
                         : `${social.name} (opens in a new tab)`;
 
                       const content = (
@@ -354,7 +348,7 @@ export default function Contact() {
                     href="https://github.com/kroue"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                    className="flex items-center gap-2 py-1 hover:opacity-80 transition-opacity hit-44"
                     style={{ textDecoration: "none" }}
                   >
                     <FaGithub size={13} style={{ color: "var(--accent-1)" }} aria-hidden="true" />
@@ -371,7 +365,7 @@ export default function Contact() {
                 </div>
               </motion.div>
 
-              {/* ---------- Right: the form ---------- */}
+              {/* Right: the form. */}
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
@@ -379,7 +373,8 @@ export default function Contact() {
                 /* Not sticky. A sticky item shifts visually without moving in
                    flow, which pushed the form out of alignment with the left
                    column and let it overlap the footer below the grid. */
-                className="card card-bracket w-full p-7"
+                className="w-full pt-6 lg:pl-8"
+                style={{ borderTop: "1px solid var(--border)" }}
               >
                 <div aria-live="polite" className="sr-only">
                   {sending
@@ -395,12 +390,6 @@ export default function Contact() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center py-8"
                   >
-                    <div
-                      style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}
-                      aria-hidden="true"
-                    >
-                      🚀
-                    </div>
                     <p className="font-bold" style={{ fontSize: "1.15rem" }}>
                       Message sent!
                     </p>
@@ -568,7 +557,7 @@ export default function Contact() {
                 letterSpacing: "0.08em",
               }}
             >
-              © {new Date().getFullYear()} kuroe — built with Next.js & React
+              © {new Date().getFullYear()} kuroe, built with Next.js and React
               Three Fiber
             </footer>
           </div>

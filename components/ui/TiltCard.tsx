@@ -9,7 +9,7 @@ interface TiltCardProps {
   glowColor?: string;
 }
 
-export default function TiltCard({ children, className = "", glowColor = "#4fc3f7" }: TiltCardProps) {
+export default function TiltCard({ children, className = "", glowColor = "#a58aff" }: TiltCardProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   const rawX = useMotionValue(0);
@@ -49,7 +49,7 @@ export default function TiltCard({ children, className = "", glowColor = "#4fc3f
         transformStyle: "preserve-3d",
         perspective: 1000,
       }}
-      className={`relative cursor-pointer ${className}`}
+      className={`relative ${className}`}
     >
       {/* Dynamic spotlight */}
       <motion.div

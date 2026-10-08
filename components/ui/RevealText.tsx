@@ -55,7 +55,7 @@ export default function RevealText({
   };
 
   // Indexing `motion` with a union collapses the props to `never`, so pin the
-  // props to motion.div's — every allowed elementType takes the same HTML
+  // props to motion.div's, since every allowed elementType takes the same HTML
   // attributes we pass here.
   const MotionTag = motion[elementType] as typeof motion.div;
 

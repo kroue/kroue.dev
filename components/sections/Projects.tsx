@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
+import Image from "next/image";
 import {
   motion,
   useInView,
@@ -9,192 +11,203 @@ import {
   useTransform,
   Variants,
 } from "framer-motion";
+import { useLenis } from "lenis/react";
 import {
   FaGithub,
   FaArrowUpRightFromSquare,
   FaChevronLeft,
   FaChevronRight,
+  FaExpand,
 } from "react-icons/fa6";
 import ShapeTransition from "@/components/ui/ShapeTransition";
 import SectionHeader from "@/components/ui/SectionHeader";
 import TechIcon from "@/components/ui/TechIcon";
+import CaseFile from "@/components/projects/CaseFile";
+import { pad } from "@/components/projects/ScreenTile";
 import { projects, Project } from "@/lib/projects";
 
 /** One base colour per accent key; tints are derived rather than hand-written. */
 const ACCENT: Record<Project["color"], string> = {
-  cyan: "#865DFF",
-  gold: "#E384FF",
-  purple: "#FFA3FD",
+  cyan: "#a58aff",
+  gold: "#ffa3fd",
+  purple: "#a58aff",
 };
 
 const tint = (color: string, percent: number) =>
   `color-mix(in srgb, ${color} ${percent}%, transparent)`;
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
+/* The open case file lives in the URL (?project=lantaw), so it can be linked
+   to directly and the back button closes it. The URL is the only copy of
+   that state; React reads it through useSyncExternalStore. */
+const PARAM = "project";
+const URL_EVENT = "casefilechange";
+
+function readOpenId() {
+  const id = new URLSearchParams(window.location.search).get(PARAM);
+  return projects.some((p) => p.id === id) ? id : null;
+}
+
+function subscribeToUrl(onChange: () => void) {
+  window.addEventListener("popstate", onChange);
+  window.addEventListener(URL_EVENT, onChange);
+  return () => {
+    window.removeEventListener("popstate", onChange);
+    window.removeEventListener(URL_EVENT, onChange);
+  };
+}
+
+function writeOpenId(id: string | null, mode: "push" | "replace") {
+  const url = new URL(window.location.href);
+  if (id) url.searchParams.set(PARAM, id);
+  else url.searchParams.delete(PARAM);
+  const next = url.pathname + url.search;
+  if (mode === "push") window.history.pushState(null, "", next);
+  else window.history.replaceState(null, "", next);
+  window.dispatchEvent(new Event(URL_EVENT));
+}
+
+const screenCount = (n: number) => `${pad(n)} ${n === 1 ? "screen" : "screens"}`;
+
+function ProjectCard({
+  project,
+  index,
+  onOpen,
+}: {
+  project: Project;
+  index: number;
+  onOpen: (rect: DOMRect) => void;
+}) {
   const accent = ACCENT[project.color];
+  const coverRef = useRef<HTMLButtonElement>(null);
+  const screens = project.screens ?? [];
+  const desk = screens.find((s) => s.device === "desktop") ?? screens[0];
+  const phone = screens.find((s) => s.device === "mobile" && s !== desk);
+
+  // The sheet always grows out of the cover when there is one, whichever
+  // control was used.
+  const open = (fallback: HTMLElement) =>
+    onOpen((coverRef.current ?? fallback).getBoundingClientRect());
 
   const linkStyle: React.CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
-    justifyContent: "center",
-    width: 38,
-    height: 38,
-    flexShrink: 0,
-    border: `1px solid ${tint(accent, 45)}`,
-    background: tint(accent, 12),
+    gap: "0.5rem",
     color: accent,
     textDecoration: "none",
-    transition: "background-color var(--dur), color var(--dur)",
+    fontSize: "0.78rem",
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+    fontFamily: "var(--font-mono), monospace",
+    transition: "opacity var(--dur) var(--ease-out)",
   };
 
-  const onLinkEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.currentTarget.style.background = accent;
-    e.currentTarget.style.color = "#191825";
-  };
-  const onLinkLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.currentTarget.style.background = tint(accent, 12);
-    e.currentTarget.style.color = accent;
-  };
+  const hasAside = Boolean(desk || project.highlights);
 
   return (
+    /* An editorial spread: the numeral overlaps the title, the write-up sits
+       in a narrow measure, and the project's own UI takes the other half. */
     <article
-      className="card card-bracket h-full flex flex-col justify-between relative overflow-hidden"
-      style={{
-        borderColor: tint(accent, 35),
-        padding: "2rem 2.25rem",
-        minHeight: 340,
-        // Accent bleeds in from the top-left corner instead of sitting as a
-        // flat bar, so the card reads as part of the section rather than a box.
-        backgroundImage: `radial-gradient(ellipse 60% 90% at 0% 0%, ${tint(accent, 12)}, transparent 70%)`,
-      }}
+      className={`relative grid grid-cols-1 gap-6 lg:gap-10 items-center ${
+        hasAside ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,47%)]" : ""
+      }`}
     >
-      {/* Oversized ghost index, echoing the section marker */}
       <span
         aria-hidden="true"
         className="mono absolute select-none"
         style={{
-          top: "0.75rem",
-          right: "1.25rem",
-          fontSize: "clamp(3.5rem, 9vw, 6rem)",
+          top: "-0.34em",
+          left: "-0.05em",
+          fontSize: "clamp(4.5rem, 13vw, 11rem)",
           fontWeight: 800,
-          lineHeight: 0.8,
-          letterSpacing: "-0.05em",
+          lineHeight: 0.72,
+          letterSpacing: "-0.06em",
           color: "transparent",
-          WebkitTextStroke: `1.5px ${tint(accent, 22)}`,
+          WebkitTextStroke: `1.5px ${tint(accent, 20)}`,
+          zIndex: 0,
         }}
       >
-        {String(index + 1).padStart(2, "0")}
+        {pad(index + 1)}
       </span>
 
-      <div className="relative">
-        <div className="flex items-start justify-between gap-4 mb-3">
-          <div>
-            <h3
-              className="font-bold mb-1"
-              style={{ fontSize: "var(--step-2)", letterSpacing: "-0.02em" }}
+      <div className="relative min-w-0" style={{ zIndex: 1, paddingLeft: "clamp(1.25rem, 5vw, 4.5rem)" }}>
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <h3
+            className="font-bold"
+            style={{ fontSize: "var(--step-2)", letterSpacing: "-0.03em", lineHeight: 1 }}
+          >
+            {project.title}
+          </h3>
+          {project.client && (
+            <span
+              className="mono"
+              style={{
+                fontSize: "0.6rem",
+                letterSpacing: "0.14em",
+                padding: "3px 8px",
+                border: `1px solid ${tint(accent, 45)}`,
+                color: accent,
+              }}
             >
-              {project.title}
-            </h3>
-            <p
-              className="mono flex items-center gap-2 flex-wrap"
-              style={{ fontSize: "0.74rem", color: accent, letterSpacing: "0.05em" }}
-            >
-              {project.tagline}
-              {project.client && (
-                <span
-                  style={{
-                    fontSize: "0.62rem",
-                    letterSpacing: "0.12em",
-                    padding: "2px 7px",
-                    border: `1px solid ${tint(accent, 45)}`,
-                    background: tint(accent, 12),
-                  }}
-                >
-                  CLIENT WORK
-                </span>
-              )}
-            </p>
-          </div>
-
+              CLIENT WORK
+            </span>
+          )}
         </div>
 
         <p
-          style={{
-            color: "var(--text-muted)",
-            fontSize: "0.92rem",
-            lineHeight: 1.65,
-            marginBottom: project.highlights ? "1rem" : "1.5rem",
-          }}
+          className="mono mt-1.5"
+          style={{ fontSize: "0.74rem", color: accent, letterSpacing: "0.05em" }}
+        >
+          {project.tagline}
+        </p>
+
+        <p
+          className="measure-wide mt-4"
+          style={{ color: "var(--text-muted)", fontSize: "0.92rem", lineHeight: 1.7 }}
         >
           {project.description}
         </p>
 
-        {/* Concrete outcomes from the résumé, kept as a scannable strip */}
-        {project.highlights && (
-          <ul className="flex flex-col gap-1.5 list-none mb-5">
-            {project.highlights.map((item) => (
-              <li
-                key={item}
-                className="flex gap-2.5"
-                style={{
-                  color: "var(--text-subtle)",
-                  fontSize: "0.82rem",
-                  lineHeight: 1.55,
-                }}
-              >
-                <span aria-hidden="true" style={{ color: accent, flexShrink: 0 }}>
-                  ▸
-                </span>
-                {item}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+        <h4 className="sr-only">Built with</h4>
+        <ul className="flex flex-wrap items-center gap-x-3 gap-y-1.5 list-none mt-4">
+          {project.tags.map((tag) => (
+            <li
+              key={tag}
+              className="mono inline-flex items-center gap-1.5"
+              style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}
+            >
+              <TechIcon name={tag} size={12} />
+              {tag}
+            </li>
+          ))}
+        </ul>
 
-      {/* Footer: tech stack left, repo/live links right.
-          The links used to sit top-right, where the oversized ghost index
-          number overlapped them. */}
-      <div
-        className="pt-4 flex items-end justify-between gap-4 flex-wrap"
-        style={{ borderTop: "1px solid var(--border-subtle)" }}
-      >
-        <div className="min-w-0">
-          <h4 className="sr-only">Built with</h4>
-          <ul className="flex flex-wrap items-center gap-2.5 list-none">
-            {project.tags.map((tag) => (
-              <li
-                key={tag}
-                title={tag}
-                className="inline-flex items-center justify-center transition-transform duration-200 hover:scale-110"
-                style={{
-                  width: 34,
-                  height: 34,
-                  background: tint(accent, 12),
-                  border: `1px solid ${tint(accent, 35)}`,
-                  color: accent,
-                }}
-              >
-                <TechIcon name={tag} size={18} />
-                <span className="sr-only">{tag}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-x-6 gap-y-2 mt-5 flex-wrap">
+          <button
+            type="button"
+            className="btn btn-primary"
+            data-case-trigger={project.id}
+            onClick={(e) => open(e.currentTarget)}
+            style={{ padding: "0.7rem 1.2rem", fontSize: "0.85rem" }}
+          >
+            <FaExpand size={12} aria-hidden="true" />
+            Open case file
+            {screens.length > 0 && (
+              <span className="mono" style={{ fontSize: "0.68rem" }}>
+                {screenCount(screens.length)}
+              </span>
+            )}
+          </button>
           {project.live && (
             <a
               href={project.live}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Open the live ${project.title} site (opens in a new tab)`}
-              title="Live site"
+              className="hit-44"
               style={linkStyle}
-              onMouseEnter={onLinkEnter}
-              onMouseLeave={onLinkLeave}
             >
-              <FaArrowUpRightFromSquare size={15} aria-hidden="true" />
+              <FaArrowUpRightFromSquare size={13} aria-hidden="true" />
+              Live site
             </a>
           )}
           {project.github && (
@@ -203,16 +216,87 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`View the ${project.title} repository on GitHub (opens in a new tab)`}
-              title="GitHub repository"
+              className="hit-44"
               style={linkStyle}
-              onMouseEnter={onLinkEnter}
-              onMouseLeave={onLinkLeave}
             >
-              <FaGithub size={17} aria-hidden="true" />
+              <FaGithub size={14} aria-hidden="true" />
+              Source
             </a>
           )}
         </div>
       </div>
+
+      {desk ? (
+        /* Pointer shortcut into the case file. It is out of the tab order and
+           hidden from assistive tech because "Open case file" is the same
+           action, already reachable and named. */
+        <button
+          ref={coverRef}
+          type="button"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="cover min-w-0"
+          style={{ zIndex: 1 }}
+          onClick={(e) => open(e.currentTarget)}
+        >
+          <span className="cover-desk">
+            {desk.url && <span className="shot-url">{desk.url}</span>}
+            <span className="cover-frame">
+              <Image
+                src={desk.src}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 520px, 100vw"
+                style={{
+                  objectFit: desk.device === "mobile" ? "contain" : "cover",
+                  objectPosition: "top",
+                }}
+              />
+              <span className="cover-count">{screenCount(screens.length)}</span>
+            </span>
+          </span>
+          {phone && (
+            <span className="cover-phone">
+              <span
+                className="shot-frame"
+                style={{ aspectRatio: `${phone.width} / ${phone.height}` }}
+              >
+                <Image
+                  src={phone.src}
+                  alt=""
+                  fill
+                  sizes="120px"
+                  style={{ objectFit: "cover", objectPosition: "top" }}
+                />
+              </span>
+            </span>
+          )}
+        </button>
+      ) : (
+        project.highlights && (
+          <ul
+            className="rail relative min-w-0"
+            style={{ zIndex: 1, borderTopColor: tint(accent, 35) }}
+          >
+            {project.highlights.map((item, i) => (
+              <li key={item} style={{ borderBottomColor: tint(accent, 20) }}>
+                <span className="rail-num" style={{ color: accent }}>
+                  {pad(i + 1)}
+                </span>
+                <span
+                  style={{
+                    color: "var(--text-subtle)",
+                    fontSize: "0.8rem",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {item}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )
+      )}
     </article>
   );
 }
@@ -221,6 +305,14 @@ export default function Projects() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0); // -1 back, 1 forward
+
+  const lenis = useLenis();
+  const openId = useSyncExternalStore(subscribeToUrl, readOpenId, () => null);
+  const openProject = projects.find((p) => p.id === openId) ?? null;
+  const [origin, setOrigin] = useState<DOMRect | null>(null);
+  // True when this page added the ?project history entry, so closing can
+  // step back off it instead of leaving a duplicate entry behind.
+  const pushedRef = useRef(false);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -235,6 +327,34 @@ export default function Projects() {
   const goTo = (index: number, dir: number) => {
     setDirection(dir);
     setCurrentIndex((index + total) % total);
+  };
+
+  const openCase = (id: string, rect: DOMRect) => {
+    setOrigin(rect);
+    pushedRef.current = true;
+    writeOpenId(id, "push");
+  };
+
+  // Moving between case files swaps the entry in place and keeps the
+  // carousel underneath on the same project, so closing lands on it.
+  const navigateCase = (dir: 1 | -1) => {
+    const from = projects.findIndex((p) => p.id === openId);
+    const to = (from + dir + total) % total;
+    goTo(to, dir);
+    writeOpenId(projects[to].id, "replace");
+  };
+
+  const closeCase = () => {
+    if (pushedRef.current) {
+      pushedRef.current = false;
+      window.history.back();
+      return;
+    }
+    // Arrived on a shared link, so there is no entry of ours to step back to.
+    const idx = projects.findIndex((p) => p.id === openId);
+    if (idx >= 0) goTo(idx, 1);
+    writeOpenId(null, "replace");
+    lenis?.scrollTo("#projects", { immediate: true, force: true });
   };
 
   const nextSlide = () => goTo(currentIndex + 1, 1);
@@ -270,8 +390,6 @@ export default function Projects() {
 
   return (
     <section id="projects" className="section scroll-mt-16" ref={containerRef}>
-      <div className="backdrop backdrop-grid" aria-hidden="true" />
-
       <ShapeTransition color="var(--accent-3)" direction="blinds" delay={0.2}>
         <motion.div
           style={{ opacity }}
@@ -283,7 +401,7 @@ export default function Projects() {
               index="04"
               label="// featured showcase"
               title="Featured Projects."
-              lede="Open-source applications, client deliverables, and system architectures on GitHub."
+              lede="Client systems and builds of my own. Open any one to see every screen."
               inView={inView}
               accent="var(--accent-3)"
             />
@@ -308,10 +426,10 @@ export default function Projects() {
                 >
                   PROJECT{" "}
                   <span style={{ color: "var(--accent-1)", fontWeight: 700 }}>
-                    {String(currentIndex + 1).padStart(2, "0")}
+                    {pad(currentIndex + 1)}
                   </span>{" "}
-                  / {String(total).padStart(2, "0")}
-                  <span className="sr-only"> — use the arrow keys to browse</span>
+                  / {pad(total)}
+                  <span className="sr-only">. Use the arrow keys to browse.</span>
                 </p>
 
                 <div className="flex gap-3">
@@ -339,7 +457,8 @@ export default function Projects() {
               <div
                 id="project-slide"
                 aria-live="polite"
-                className="relative overflow-hidden w-full min-h-[360px] flex items-center justify-center"
+                className="relative overflow-hidden w-full min-h-[330px] flex items-center justify-center"
+                style={{ paddingBottom: "0.75rem", paddingRight: "0.75rem" }}
               >
                 <AnimatePresence initial={false} custom={direction} mode="wait">
                   <motion.div
@@ -351,13 +470,17 @@ export default function Projects() {
                     exit="exit"
                     className="w-full"
                   >
-                    <ProjectCard project={activeProject} index={currentIndex} />
+                    <ProjectCard
+                      project={activeProject}
+                      index={currentIndex}
+                      onOpen={(rect) => openCase(activeProject.id, rect)}
+                    />
                   </motion.div>
                 </AnimatePresence>
               </div>
 
               {/* Pagination */}
-              <div className="flex items-center justify-center gap-3 mt-10">
+              <div className="flex items-center justify-center gap-3 mt-6">
                 {projects.map((project, idx) => (
                   <button
                     key={project.id}
@@ -365,21 +488,34 @@ export default function Projects() {
                     onClick={() => goTo(idx, idx > currentIndex ? 1 : -1)}
                     aria-label={`Show ${project.title}`}
                     aria-current={idx === currentIndex ? "true" : undefined}
-                    className="cursor-pointer transition-all duration-200"
+                    className="cursor-pointer grid place-items-center"
                     style={{
-                      width: idx === currentIndex ? 32 : 10,
-                      height: 10,
-                      borderRadius: "var(--radius-pill)",
-                      background:
-                        idx === currentIndex ? "var(--accent-1)" : "var(--border)",
+                      width: 44,
+                      height: 44,
+                      background: "none",
                       border: "none",
                     }}
-                  />
+                  >
+                    {/* The 44px button is the touch target; this is the mark. */}
+                    <span
+                      aria-hidden="true"
+                      className="transition-all duration-200"
+                      style={{
+                        display: "block",
+                        width: idx === currentIndex ? 30 : 10,
+                        height: 4,
+                        background:
+                          idx === currentIndex
+                            ? "var(--accent-1)"
+                            : "var(--border-strong)",
+                      }}
+                    />
+                  </button>
                 ))}
               </div>
             </div>
 
-            <div className="flex justify-center mt-10">
+            <div className="flex justify-center mt-6">
               <a
                 href="https://github.com/kroue"
                 target="_blank"
@@ -388,12 +524,25 @@ export default function Projects() {
                 style={{ fontSize: "0.9rem" }}
               >
                 <FaGithub size={16} aria-hidden="true" />
-                Explore All Repositories on GitHub
+                See all repositories on GitHub
               </a>
             </div>
           </div>
         </motion.div>
       </ShapeTransition>
+
+      {/* Portalled to <body> so the section's scroll-linked opacity and
+          clip-path curtain can't reach the case file. */}
+      {openProject &&
+        createPortal(
+          <CaseFile
+            project={openProject}
+            origin={origin}
+            onClosed={closeCase}
+            onNavigate={navigateCase}
+          />,
+          document.body
+        )}
     </section>
   );
 }

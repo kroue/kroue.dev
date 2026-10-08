@@ -27,8 +27,8 @@ const COMMANDS: Record<string, string[]> = {
     "Stack:    TypeScript / React / Angular / Kotlin",
     "Focus:    Offline-first architecture",
     "Location: Cagayan de Oro, PH · open to remote",
-    "School:   USTP — BS Information Technology, 2026",
-    "Status:   Open to work ✅",
+    "School:   USTP, BS Information Technology, 2026",
+    "Status:   Open to work",
   ],
   skills: [
     "Web       → React · Next.js · Angular · Vue · TypeScript",
@@ -41,7 +41,7 @@ const COMMANDS: Record<string, string[]> = {
     "            PWA/service workers · unit testing · docs",
   ],
   experience: [
-    "Freelance Software Developer      2024 — Present",
+    "Freelance Software Developer      2024-Present",
     "Independent · water utilities, retail, printing",
     "─────────────────────────────────",
     "Delivered three production systems end to end:",
@@ -57,25 +57,25 @@ const COMMANDS: Record<string, string[]> = {
   ],
   projects: [
     "Client systems:",
-    "  [1] MEEDO      — Water utility billing platform",
+    "  [1] MEEDO      : Water utility billing platform",
     "                   Android + Web, offline-first",
-    "  [2] InvenTrack — POS & inventory platform",
+    "  [2] InvenTrack : POS and inventory platform",
     "                   Angular · Supabase · PostgreSQL",
-    "  [3] NVAGo      — Booking & POS for NVA Printing",
+    "  [3] NVAGo      : Booking and POS for NVA Printing",
     "",
     "Other work:",
-    "  [4] LiCEnSURE  — ML exam-outcome forecasting",
+    "  [4] LiCEnSURE  : ML exam-outcome forecasting",
     "                   86.12% acc · 0.9213 ROC AUC",
     "",
     "GitHub: github.com/kroue",
   ],
   education: [
     "University of Science and Technology",
-    "of Southern Philippines            2022 — 2026",
+    "of Southern Philippines            2022-2026",
     "  BS Information Technology · Cagayan de Oro",
     "",
-    "STI College Tagum                  2019 — 2021",
-    "  ICT — Mobile, Application and Web Development",
+    "STI College Tagum                  2019-2021",
+    "  ICT: Mobile, Application and Web Development",
   ],
   languages: [
     "English   → C2 (Proficient)",
@@ -94,11 +94,8 @@ const COMMANDS: Record<string, string[]> = {
 };
 
 const MOTD = [
-  "  ╔══════════════════════════════════════╗",
-  "  ║         kuroe.dev ~ terminal         ║",
-  "  ╚══════════════════════════════════════╝",
-  "",
-  '  Type "help" to see available commands.',
+  "kuroe.dev ~ terminal",
+  'Type "help" to see available commands.',
   "",
 ];
 
@@ -159,24 +156,24 @@ export default function TerminalCard() {
 
   return (
     <div
-      className="glass rounded-xl overflow-hidden"
-      style={{ border: "1px solid rgba(79,195,247,0.2)", maxWidth: 580 }}
+      className="card overflow-hidden"
+      style={{ maxWidth: 580 }}
       onClick={() => inputRef.current?.focus()}
     >
       {/* Title bar */}
       <div
         className="flex items-center gap-2 px-6 py-4"
         style={{
-          background: "rgba(13,13,26,0.9)",
-          borderBottom: "1px solid rgba(79,195,247,0.15)",
+          background: "var(--background)",
+          borderBottom: "1px solid var(--border)",
         }}
       >
-        <div className="w-3 h-3 rounded-full" style={{ background: "#ef4444" }} />
-        <div className="w-3 h-3 rounded-full" style={{ background: "#c8a96e" }} />
-        <div className="w-3 h-3 rounded-full" style={{ background: "#4fc3f7" }} />
+        <div className="w-3 h-3 rounded-full" style={{ background: "var(--border-strong)" }} />
+        <div className="w-3 h-3 rounded-full" style={{ background: "var(--border-strong)" }} />
+        <div className="w-3 h-3 rounded-full" style={{ background: "var(--border-strong)" }} />
         <span
           className="ml-2 text-xs"
-          style={{ fontFamily: "JetBrains Mono, monospace", color: "#6b6b8a" }}
+          style={{ fontFamily: "JetBrains Mono, monospace", color: "var(--text-subtle)" }}
         >
           kuroe.dev
         </span>
@@ -187,12 +184,12 @@ export default function TerminalCard() {
         ref={terminalBodyRef}
         className="overflow-y-auto"
         style={{
-          height: 320,
-          padding: "1.75rem",
+          height: "clamp(240px, 42vh, 320px)",
+          padding: "clamp(1rem, 4vw, 1.75rem)",
           fontFamily: "JetBrains Mono, monospace",
           fontSize: "0.78rem",
           lineHeight: 1.6,
-          color: "#e2d9c5",
+          color: "var(--text-muted)",
           // Without this, HTML collapses runs of spaces and the ASCII box and
           // column alignment in the command output render ragged. `pre-wrap`
           // keeps the padding but still wraps lines that are too long.
@@ -201,7 +198,10 @@ export default function TerminalCard() {
       >
         {/* MOTD */}
         {MOTD.map((line, i) => (
-          <div key={i} style={{ color: "#4fc3f7" }}>
+          <div
+            key={i}
+            style={{ color: i === 0 ? "var(--accent-2)" : "var(--text-subtle)" }}
+          >
             {line}
           </div>
         ))}
@@ -215,13 +215,13 @@ export default function TerminalCard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.15 }}
             >
-              <div style={{ color: "#4fc3f7" }}>
-                <span style={{ color: "#c8a96e" }}>~</span>
-                <span style={{ color: "#6b6b8a" }}> $ </span>
+              <div style={{ color: "var(--accent-2)" }}>
+                <span style={{ color: "var(--accent-1)" }}>~</span>
+                <span style={{ color: "var(--text-subtle)" }}> $ </span>
                 {entry.command}
               </div>
               {entry.output.map((line, j) => (
-                <div key={j} style={{ color: "#a1a1aa", paddingLeft: "0.5rem" }}>
+                <div key={j} style={{ color: "var(--text-muted)", paddingLeft: "0.5rem" }}>
                   {line}
                 </div>
               ))}
@@ -232,8 +232,8 @@ export default function TerminalCard() {
 
         {/* Input row */}
         <form onSubmit={handleSubmit} className="flex items-center gap-1">
-          <span style={{ color: "#c8a96e" }}>~</span>
-          <span style={{ color: "#6b6b8a" }}> $ </span>
+          <span style={{ color: "var(--accent-1)" }}>~</span>
+          <span style={{ color: "var(--text-subtle)" }}> $ </span>
           <input
             ref={inputRef}
             value={input}
@@ -246,14 +246,14 @@ export default function TerminalCard() {
               background: "transparent",
               border: "none",
               outline: "none",
-              color: "#f0eeee",
+              color: "var(--text-primary)",
               fontFamily: "JetBrains Mono, monospace",
               fontSize: "0.78rem",
               flex: 1,
-              caretColor: "#4fc3f7",
+              caretColor: "var(--accent-1)",
             }}
           />
-          <span className="cursor-blink" style={{ color: "#4fc3f7" }}>
+          <span className="cursor-blink" style={{ color: "var(--accent-2)" }}>
             ▊
           </span>
         </form>

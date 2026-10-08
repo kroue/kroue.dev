@@ -1,30 +1,36 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function EasterEgg() {
   const [active, setActive] = useState(false);
-  const [clickCount, setClickCount] = useState(0);
+  const clicksRef = useRef(0);
 
-  // Triple-click on name triggers easter egg
+  // Three clicks on the hero name opens it. The count lives in a ref so the
+  // threshold is checked in the event handler rather than in an effect.
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.id === "hero-name") {
-        setClickCount((c) => c + 1);
+      if ((e.target as HTMLElement).id !== "hero-name") return;
+      clicksRef.current += 1;
+      if (clicksRef.current >= 3) {
+        clicksRef.current = 0;
+        setActive(true);
       }
     };
     window.addEventListener("click", handleClick);
     return () => window.removeEventListener("click", handleClick);
   }, []);
 
+  // A full-screen overlay has to be dismissible from the keyboard.
   useEffect(() => {
-    if (clickCount >= 3) {
-      setActive(true);
-      setClickCount(0);
-    }
-  }, [clickCount]);
+    if (!active) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setActive(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [active]);
 
   // Konami code
   useEffect(() => {
@@ -52,8 +58,11 @@ export default function EasterEgg() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Easter egg. Press Escape to close."
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
-          style={{ background: "rgba(4,4,12,0.97)", backdropFilter: "blur(12px)" }}
+          style={{ background: "rgba(25, 24, 37, 0.97)", backdropFilter: "blur(12px)" }}
           onClick={() => setActive(false)}
         >
           {/* Ink splash rings */}
@@ -67,7 +76,7 @@ export default function EasterEgg() {
               style={{
                 width: 200,
                 height: 200,
-                border: `2px solid ${i === 0 ? "#4fc3f7" : i === 1 ? "#c8a96e" : "#a78bfa"}`,
+                border: `2px solid ${i === 0 ? "var(--accent-2)" : i === 1 ? "var(--accent-1)" : "var(--accent-1)"}`,
               }}
             />
           ))}
@@ -82,13 +91,13 @@ export default function EasterEgg() {
               style={{
                 fontSize: "clamp(5rem, 15vw, 10rem)",
                 fontFamily: "serif",
-                background: "linear-gradient(135deg, #c8a96e, #f0c97a, #c8a96e)",
+                background: "linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-1))",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
                 textShadow: "none",
                 lineHeight: 1,
-                filter: "drop-shadow(0 0 40px rgba(200,169,110,0.6))",
+                filter: "drop-shadow(0 0 40px var(--accent-1-a40))",
               }}
             >
               黑風
@@ -104,9 +113,9 @@ export default function EasterEgg() {
                   fontFamily: "JetBrains Mono, monospace",
                   fontSize: "1.1rem",
                   letterSpacing: "0.5em",
-                  color: "#c8a96e",
+                  color: "var(--accent-1)",
                   textTransform: "uppercase",
-                  textShadow: "0 0 20px rgba(200,169,110,0.5)",
+                  textShadow: "0 0 20px var(--accent-1-a40)",
                 }}
               >
                 Black Storm
@@ -117,10 +126,10 @@ export default function EasterEgg() {
                   fontFamily: "JetBrains Mono, monospace",
                   fontSize: "0.7rem",
                   letterSpacing: "0.3em",
-                  color: "#6b6b8a",
+                  color: "var(--text-subtle)",
                 }}
               >
-                // you found the hidden identity
+                {"// you found the hidden identity"}
               </div>
             </motion.div>
 
@@ -133,7 +142,7 @@ export default function EasterEgg() {
               style={{
                 height: 1,
                 width: 240,
-                background: "linear-gradient(90deg, transparent, #c8a96e, transparent)",
+                background: "linear-gradient(90deg, transparent, var(--accent-1), transparent)",
               }}
             />
             <motion.div
@@ -144,7 +153,7 @@ export default function EasterEgg() {
               style={{
                 fontFamily: "JetBrains Mono, monospace",
                 fontSize: "0.65rem",
-                color: "#3a3a5c",
+                color: "var(--border)",
                 letterSpacing: "0.2em",
               }}
             >

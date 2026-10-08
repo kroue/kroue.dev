@@ -24,7 +24,7 @@ interface TierOrbit {
 const ORBITS: Record<string, TierOrbit> = {
   frontend: {
     id: "frontend",
-    color: "#865DFF",
+    color: "#a58aff",
     radius: 1.85,
     tiltX: 0.45,
     tiltZ: 0.2,
@@ -35,7 +35,7 @@ const ORBITS: Record<string, TierOrbit> = {
   },
   backend: {
     id: "backend",
-    color: "#E384FF",
+    color: "#a58aff",
     radius: 2.35,
     tiltX: -0.55,
     tiltZ: -0.3,
@@ -46,7 +46,7 @@ const ORBITS: Record<string, TierOrbit> = {
   },
   systems: {
     id: "systems",
-    color: "#FFA3FD",
+    color: "#a58aff",
     radius: 2.85,
     tiltX: 0.75,
     tiltZ: -0.2,
@@ -57,7 +57,7 @@ const ORBITS: Record<string, TierOrbit> = {
   },
   tooling: {
     id: "tooling",
-    color: "#5EC8FF",
+    color: "#a58aff",
     radius: 2.1,
     tiltX: -0.2,
     tiltZ: 0.6,
@@ -131,7 +131,7 @@ function CoreOrb() {
         <sphereGeometry args={[1.2, 32, 32]} />
         <meshStandardMaterial
           color="#191825"
-          emissive="#865DFF"
+          emissive="#a58aff"
           emissiveIntensity={0.2}
           metalness={0.9}
           roughness={0.1}
@@ -141,11 +141,11 @@ function CoreOrb() {
       <mesh ref={glowRef} scale={1.05}>
         <sphereGeometry args={[1.2, 14, 14]} />
         <meshStandardMaterial
-          color="#865DFF"
+          color="#a58aff"
           wireframe
           transparent
           opacity={0.35}
-          emissive="#865DFF"
+          emissive="#a58aff"
           emissiveIntensity={0.6}
         />
       </mesh>
@@ -253,17 +253,18 @@ function SkillNode({ skill }: { skill: Skill }) {
           href={getTechUrl(skill.name)}
           target="_blank"
           rel="noopener noreferrer"
+          // hit-44 lifts the touch area to 44px without growing the label,
+          // which has to stay small to orbit without colliding.
+          className="hit-44"
           style={{
             fontFamily: "JetBrains Mono, monospace",
             fontSize: "10px",
             color: orbit.color,
             whiteSpace: "nowrap",
-            textShadow: `0 0 6px ${orbit.color}`,
-            background: "rgba(25,24,37,0.9)",
+            background: "rgba(25,24,37,0.92)",
             padding: "2.5px 8px",
-            borderRadius: "4px",
+            borderRadius: "var(--radius)",
             border: `1px solid ${orbit.color}50`,
-            backdropFilter: "blur(4px)",
             marginTop: "6px",
             display: "flex",
             alignItems: "center",
@@ -294,9 +295,9 @@ function OrbScene() {
   return (
     <>
       <ambientLight intensity={0.2} />
-      <pointLight position={[5, 5, 5]} intensity={2} color="#865DFF" />
-      <pointLight position={[-5, -3, -5]} intensity={1.5} color="#E384FF" />
-      <pointLight position={[0, 0, 0]} intensity={0.5} color="#FFA3FD" />
+      <pointLight position={[5, 5, 5]} intensity={2} color="#a58aff" />
+      <pointLight position={[-5, -3, -5]} intensity={1.5} color="#ffa3fd" />
+      <pointLight position={[0, 0, 0]} intensity={0.5} color="#ffa3fd" />
       <CoreOrb />
 
       {/* Render 3D gyroscope orbit ring lines */}

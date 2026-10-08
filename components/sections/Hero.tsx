@@ -15,15 +15,17 @@ function TypewriterText() {
   const [roleIndex, setRoleIndex] = useState(0);
   const [displayed, setDisplayed] = useState("");
   const [deleting, setDeleting] = useState(false);
+  // One pass through the roles, then it rests on the primary title. An endless
+  // loop would compete with the page for attention and overshoot MOTION 2.
+  const [settled, setSettled] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Every transition is scheduled on a timer, so the effect never calls
-  // setState synchronously and cascades an extra render.
   useEffect(() => {
+    if (settled) return;
     const current = ROLES[roleIndex];
 
     if (!deleting && displayed === current) {
-      // Word complete — hold it, then start erasing.
+      // Word complete, so hold it and then start erasing.
       timeoutRef.current = setTimeout(() => setDeleting(true), 2000);
     } else if (!deleting) {
       timeoutRef.current = setTimeout(
@@ -35,16 +37,21 @@ function TypewriterText() {
         () => setDisplayed(displayed.slice(0, -1)),
         35
       );
-    } else {
-      // Erased — move on to the next role.
+    } else if (roleIndex < ROLES.length - 1) {
       timeoutRef.current = setTimeout(() => {
         setDeleting(false);
-        setRoleIndex((i) => (i + 1) % ROLES.length);
+        setRoleIndex((i) => i + 1);
+      }, 200);
+    } else {
+      timeoutRef.current = setTimeout(() => {
+        setDisplayed(ROLES[0]);
+        setDeleting(false);
+        setSettled(true);
       }, 200);
     }
 
     return () => clearTimeout(timeoutRef.current);
-  }, [displayed, deleting, roleIndex]);
+  }, [displayed, deleting, roleIndex, settled]);
 
   return (
     <>
@@ -60,7 +67,7 @@ function TypewriterText() {
         }}
       >
         {displayed}
-        <span className="cursor-blink">|</span>
+        {!settled && <span className="cursor-blink">|</span>}
       </span>
     </>
   );
@@ -112,7 +119,7 @@ export default function Hero() {
           }}
         >
           <span
-            className="w-2 h-2 pulse-dot"
+            className="w-2 h-2"
             style={{
               background: "var(--accent-2)",
               borderRadius: "var(--radius-pill)",
@@ -182,7 +189,7 @@ export default function Hero() {
 
         {/* Tagline */}
         <RevealText
-          text="I ship production systems for paying clients — offline-first Android field apps, POS and inventory platforms, and the web consoles behind them. Cagayan de Oro, open to remote."
+          text="I ship production systems for paying clients: offline-first Android field apps, POS and inventory platforms, and the web consoles behind them. Cagayan de Oro, open to remote."
           elementType="p"
           delay={0.8}
           stagger={0.01}
@@ -204,10 +211,10 @@ export default function Hero() {
           className="flex flex-wrap gap-4 justify-center"
         >
           <a href="#projects" className="btn btn-primary">
-            View My Work
+            See the projects
           </a>
           <a href="#contact" className="btn btn-ghost">
-            Get In Touch
+            Start a conversation
           </a>
         </motion.div>
 
@@ -233,23 +240,12 @@ export default function Hero() {
           Scroll
         </span>
         <div
-          className="w-[1px] h-12 overflow-hidden"
-          style={{ background: "var(--border)" }}
-        >
-          <motion.div
-            animate={{ y: ["-100%", "100%"] }}
-            transition={{
-              repeat: Infinity,
-              duration: 1.5,
-              ease: "linear",
-            }}
-            className="w-full h-full"
-            style={{
-              background:
-                "linear-gradient(to bottom, transparent, var(--accent-1), transparent)",
-            }}
-          />
-        </div>
+          className="w-[1px] h-12"
+          style={{
+            background:
+              "linear-gradient(to bottom, var(--accent-1), transparent)",
+          }}
+        />
       </motion.div>
     </motion.section>
   );

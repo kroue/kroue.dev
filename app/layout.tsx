@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Aljohn Arranguez | Full-Stack & Mobile Developer",
   description:
-    "Portfolio of Aljohn Arranguez — a full-stack and mobile developer from Cagayan de Oro shipping production systems in TypeScript (React, Next.js, Angular) and Kotlin (Jetpack Compose), with a specialty in offline-first architecture.",
+    "Portfolio of Aljohn Arranguez, a full-stack and mobile developer from Cagayan de Oro shipping production systems in TypeScript (React, Next.js, Angular) and Kotlin (Jetpack Compose), with a specialty in offline-first architecture.",
   keywords: [
     "full-stack developer",
     "mobile developer",

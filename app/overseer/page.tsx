@@ -19,7 +19,7 @@ type Filter = "all" | "new" | "read" | "archived";
 const FILTERS: Filter[] = ["all", "new", "read", "archived"];
 
 function formatDate(date: Date | null): string {
-  if (!date) return "—";
+  if (!date) return "unknown";
   return date.toLocaleString(undefined, {
     year: "numeric",
     month: "short",
@@ -69,8 +69,8 @@ export default function OverseerPage() {
 
   // Loading happens inside the auth subscription callback rather than in a
   // second effect keyed on `user`. That is the shape this hook is meant to
-  // have — subscribe to an external system, set state when it reports a change
-  // — and it avoids the cascading render a separate effect would cause.
+  // have: subscribe to an external system, set state when it reports a change.
+  // It also avoids the cascading render a separate effect would cause.
   useEffect(() => {
     return watchAuth((next) => {
       setUser(next);
@@ -324,18 +324,8 @@ export default function OverseerPage() {
                   key={f}
                   type="button"
                   onClick={() => setFilter(f)}
-                  className="mono cursor-pointer"
+                  className="pill-toggle"
                   aria-pressed={filter === f}
-                  style={{
-                    padding: "0.4rem 0.9rem",
-                    fontSize: "0.72rem",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    border: `1px solid ${filter === f ? "var(--accent-1)" : "var(--border)"}`,
-                    background: filter === f ? "var(--accent-1)" : "var(--surface)",
-                    color: filter === f ? "#fff" : "var(--text-muted)",
-                    transition: "all var(--dur) var(--ease-out)",
-                  }}
                 >
                   {f} ({counts[f]})
                 </button>
@@ -348,8 +338,8 @@ export default function OverseerPage() {
                 style={{ color: "var(--text-subtle)", fontSize: "0.9rem" }}
               >
                 {messages.length === 0
-                  ? "No messages yet."
-                  : `No ${filter} messages.`}
+                  ? "No messages yet. They arrive here when someone sends the contact form on the home page."
+                  : `Nothing marked ${filter}. Switch the filter above to see the rest.`}
               </p>
             ) : (
               <ul className="flex flex-col gap-3 list-none">

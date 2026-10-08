@@ -1,6 +1,6 @@
 /**
  * Single source of truth for résumé-derived content.
- * Mirrors Arranguez_Aljohn_Resume_2026.pdf — keep the two in sync.
+ * Mirrors Arranguez_Aljohn_Resume_2026.pdf. Keep the two in sync.
  */
 
 export const PROFILE = {
@@ -26,7 +26,7 @@ export const ROLES = [
 ];
 
 export const SUMMARY =
-  "Full-stack developer shipping production systems for paying clients — a point-of-sale and inventory platform, a water utility billing system pairing an offline-first Android field app with a web admin console, and a booking and POS platform.";
+  "Full-stack developer shipping production systems for paying clients: a point-of-sale and inventory platform, a water utility billing system pairing an offline-first Android field app with a web admin console, and a booking and POS platform.";
 
 export const SPECIALTY =
   "Recurring specialty in offline-first architecture: systems that keep working through the connectivity outages routine for clients outside major cities, then reconcile cleanly on reconnect.";
@@ -48,7 +48,7 @@ export const EXPERIENCE: Role[] = [
     company: "Independent",
     title: "Freelance Software Developer",
     meta: "Clients in water utilities, retail, and printing",
-    period: "2024 — Present",
+    period: "2024-Present",
     location: "Cagayan de Oro City / Remote",
     summary:
       "Delivered three production systems end to end: proposal, requirements gathering with non-technical stakeholders, development, testing, documentation, deployment, and staff training.",
@@ -93,25 +93,25 @@ export const EXPERIENCE: Role[] = [
 ];
 
 export const EARLIER_ROLES = [
-  { title: "Layout Artist", company: "NVA Printing Services", period: "2023 — 2024" },
+  { title: "Layout Artist", company: "NVA Printing Services", period: "2023-2024" },
   { title: "Customer Service Representative", company: "Teleperformance", period: "2023" },
-  { title: "Call Center Agent", company: "Celerity", period: "2021 — 2022" },
+  { title: "Call Center Agent", company: "Celerity", period: "2021-2022" },
 ];
 
 export const EARLIER_NOTE =
-  "Three years client-facing, two of them supporting English-speaking international customers by phone, email, and chat — the communication grounding for remote, async engineering work.";
+  "Three years client-facing, two of them supporting English-speaking international customers by phone, email, and chat. That is the communication grounding for remote, async engineering work.";
 
 export const EDUCATION = [
   {
     school: "University of Science and Technology of Southern Philippines",
     credential: "BS Information Technology",
-    period: "2022 — 2026",
+    period: "2022-2026",
     location: "Cagayan de Oro City",
   },
   {
     school: "STI College Tagum",
-    credential: "ICT — Mobile, Application and Web Development",
-    period: "2019 — 2021",
+    credential: "ICT: Mobile, Application and Web Development",
+    period: "2019-2021",
     location: "Tagum City",
   },
 ];

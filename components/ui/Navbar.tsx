@@ -25,7 +25,7 @@ export default function Navbar() {
 
     // An IntersectionObserver cannot drive this: #hero is `position: sticky`,
     // so it stays pinned across the viewport for the entire scroll and reports
-    // as intersecting the whole way down — which pinned the indicator to
+    // as intersecting the whole way down, which pinned the indicator to
     // "Home". Resolving against the scrolled sections' own rects instead, and
     // treating hero as the fallback, is unambiguous.
     const resolveActive = () => {
@@ -137,7 +137,7 @@ export default function Navbar() {
       }}
     >
       <div className="nav-shell">
-        {/* Left — logo, revealed once you leave the hero */}
+        {/* Logo, revealed once you leave the hero. */}
         <div className="flex items-center min-w-[100px]">
           <AnimatePresence>
             {active !== "#hero" && (
@@ -149,7 +149,7 @@ export default function Navbar() {
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 onClick={() => handleClick("#hero")}
                 aria-label="Back to top"
-                className="mono cursor-pointer"
+                className="mono cursor-pointer hit-44"
                 style={{
                   fontSize: "0.9rem",
                   color: "var(--accent-1)",
@@ -166,7 +166,7 @@ export default function Navbar() {
           </AnimatePresence>
         </div>
 
-        {/* Center — desktop links */}
+        {/* Desktop links. */}
         <ul className="hidden md:flex items-center gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 list-none">
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
@@ -192,7 +192,7 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* Right — mobile toggle */}
+        {/* Mobile toggle. */}
         <button
           className="md:hidden flex flex-col gap-1.5 p-2"
           onClick={() => setMenuOpen((open) => !open)}

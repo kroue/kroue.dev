@@ -148,7 +148,7 @@ function StarField() {
     <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
       <pointsMaterial
         transparent
-        color="#4fc3f7"
+        color="#a58aff"
         size={0.025}
         sizeAttenuation
         depthWrite={false}
@@ -173,25 +173,25 @@ function CameraRig() {
 // ── Scene ────────────────────────────────────────────────────────────────────
 
 const shapes = [
-  { type: "ico", pos: [-4, 1.5, -3] as [number, number, number], speed: 0.4, scale: 0.55, color: "#4fc3f7" },
-  { type: "torus", pos: [4, -1, -4] as [number, number, number], speed: 0.3, scale: 0.45, color: "#c8a96e" },
-  { type: "oct", pos: [2, 2.5, -5] as [number, number, number], speed: 0.5, scale: 0.4, color: "#a78bfa" },
-  { type: "ico", pos: [-3, -2, -4] as [number, number, number], speed: 0.35, scale: 0.45, color: "#c8a96e" },
-  { type: "torus", pos: [-5, 0.5, -6] as [number, number, number], speed: 0.25, scale: 0.35, color: "#4fc3f7" },
-  { type: "oct", pos: [5.5, 1, -3] as [number, number, number], speed: 0.45, scale: 0.5, color: "#4fc3f7" },
-  { type: "ico", pos: [0, 3.5, -5] as [number, number, number], speed: 0.3, scale: 0.38, color: "#a78bfa" },
-  { type: "torus", pos: [-1.5, -3, -3] as [number, number, number], speed: 0.5, scale: 0.3, color: "#c8a96e" },
-  { type: "oct", pos: [3.5, -2.5, -6] as [number, number, number], speed: 0.28, scale: 0.42, color: "#4fc3f7" },
-  { type: "ico", pos: [-6, 2, -5] as [number, number, number], speed: 0.38, scale: 0.35, color: "#a78bfa" },
+  { type: "ico", pos: [-4, 1.5, -3] as [number, number, number], speed: 0.4, scale: 0.55, color: "#a58aff" },
+  { type: "torus", pos: [4, -1, -4] as [number, number, number], speed: 0.3, scale: 0.45, color: "#ffa3fd" },
+  { type: "oct", pos: [2, 2.5, -5] as [number, number, number], speed: 0.5, scale: 0.4, color: "#a58aff" },
+  { type: "ico", pos: [-3, -2, -4] as [number, number, number], speed: 0.35, scale: 0.45, color: "#ffa3fd" },
+  { type: "torus", pos: [-5, 0.5, -6] as [number, number, number], speed: 0.25, scale: 0.35, color: "#a58aff" },
+  { type: "oct", pos: [5.5, 1, -3] as [number, number, number], speed: 0.45, scale: 0.5, color: "#a58aff" },
+  { type: "ico", pos: [0, 3.5, -5] as [number, number, number], speed: 0.3, scale: 0.38, color: "#a58aff" },
+  { type: "torus", pos: [-1.5, -3, -3] as [number, number, number], speed: 0.5, scale: 0.3, color: "#ffa3fd" },
+  { type: "oct", pos: [3.5, -2.5, -6] as [number, number, number], speed: 0.28, scale: 0.42, color: "#a58aff" },
+  { type: "ico", pos: [-6, 2, -5] as [number, number, number], speed: 0.38, scale: 0.35, color: "#a58aff" },
 ];
 
 function Scene() {
   return (
     <>
       <ambientLight intensity={0.15} />
-      <pointLight position={[5, 5, 5]} intensity={1.5} color="#4fc3f7" />
-      <pointLight position={[-5, -5, -5]} intensity={1} color="#c8a96e" />
-      <pointLight position={[0, 10, 0]} intensity={0.5} color="#a78bfa" />
+      <pointLight position={[5, 5, 5]} intensity={1.5} color="#a58aff" />
+      <pointLight position={[-5, -5, -5]} intensity={1} color="#ffa3fd" />
+      <pointLight position={[0, 10, 0]} intensity={0.5} color="#a58aff" />
       <StarField />
       {shapes.map((s, i) => {
         if (s.type === "ico")

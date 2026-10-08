@@ -42,7 +42,7 @@ export function validateContact(form: ContactForm): ContactErrors {
   }
 
   if (message.length < LIMITS.message.min) {
-    errors.message = `Tell me a little more — at least ${LIMITS.message.min} characters.`;
+    errors.message = `Tell me a little more, at least ${LIMITS.message.min} characters.`;
   } else if (message.length > LIMITS.message.max) {
     errors.message = `Keep this under ${LIMITS.message.max} characters.`;
   }
@@ -61,7 +61,7 @@ function readLastSentAt(): number {
   try {
     return Number(window.localStorage.getItem(COOLDOWN_KEY)) || 0;
   } catch {
-    return 0; // Private mode / storage disabled — skip the check rather than fail.
+    return 0; // Private mode or storage disabled, so skip the check rather than fail.
   }
 }
 
@@ -95,7 +95,7 @@ function describeFirestoreError(error: unknown): string {
 
   switch (code) {
     case "permission-denied":
-      return "The message couldn't be saved — the database rejected the write. If you're the site owner, check the Firestore security rules.";
+      return "The message couldn't be saved. The database rejected the write. If you're the site owner, check the Firestore security rules.";
     case "unavailable":
     case "deadline-exceeded":
       return "Couldn't reach the server. Check your connection and try again.";

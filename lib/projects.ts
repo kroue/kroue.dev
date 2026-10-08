@@ -1,3 +1,21 @@
+/** One captured screen of a project, shown in its case file. */
+export interface Screen {
+  src: string;
+  /** What the screen shows, for screen readers. */
+  alt: string;
+  caption: string;
+  device: "desktop" | "mobile";
+  /** Which part of the product it belongs to; screens are grouped by this. */
+  surface: string;
+  /** Address shown above a desktop capture. */
+  url?: string;
+  width: number;
+  height: number;
+}
+
+const DESKTOP = { device: "desktop", width: 1440, height: 900 } as const;
+const MOBILE = { device: "mobile", width: 780, height: 1688 } as const;
+
 export interface Project {
   id: string;
   title: string;
@@ -11,21 +29,23 @@ export interface Project {
   highlights?: string[];
   /** Shipped for a paying client rather than coursework. */
   client?: boolean;
+  /** Captures for the case file, in reading order. The first is the cover. */
+  screens?: Screen[];
 }
 
 export const projects: Project[] = [
   {
     id: "meedo",
     title: "MEEDO",
-    tagline: "Water Utility Billing Platform — Android + Web",
+    tagline: "Water Utility Billing Platform: Android and Web",
     description:
       "Offline-first field app for meter readers paired with a web admin console. Readings are recorded anywhere on route with no signal, an itemized bill prints on the spot over a Bluetooth thermal printer, and everything syncs once back in coverage.",
     tags: ["Kotlin", "Jetpack Compose", "Next.js", "React", "TypeScript", "Firebase"],
     color: "gold",
     client: true,
     highlights: [
-      "Background sync via WorkManager with exponential back-off (30s → 5min cap)",
-      "Per-reading PENDING/SYNCED/FAILED state — flaky signal degrades throughput, never loses data",
+      "Background sync via WorkManager with exponential back-off, 30s rising to a 5min cap",
+      "Per-reading PENDING/SYNCED/FAILED state, so a flaky signal degrades throughput instead of losing data",
       "Board-approved rate card encoded as a pure, unit-testable billing engine",
     ],
   },
@@ -44,11 +64,85 @@ export const projects: Project[] = [
       "Role-based access enforced with row-level security policies",
       "Automated low-stock and near-expiry alerts replaced manual daily stock checks",
     ],
+    screens: [
+      {
+        ...DESKTOP,
+        src: "/projects/inventrack/01-dashboard.webp",
+        caption: "Dashboard and demand forecast",
+        surface: "Web app",
+        url: "inventrack-jade.vercel.app/dashboard",
+        alt: "InvenTrack dashboard: total revenue, a stock-health bar split into in stock, low and out, pending restock requests, a weekly sales chart, a quick overview of stock alerts, and a predictive analytics table with velocity, lead time, reorder point and suggested order quantity per product.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/inventrack/02-pos.webp",
+        caption: "POS checkout",
+        surface: "Web app",
+        url: "inventrack-jade.vercel.app/pos",
+        alt: "Point-of-sale screen: a barcode and product search field over a grid of product cards with price and stock, and a current-order panel with subtotal, total, cash or GCash payment, and a checkout and print receipt button.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/inventrack/03-inventory.webp",
+        caption: "Inventory",
+        surface: "Web app",
+        url: "inventrack-jade.vercel.app/inventory",
+        alt: "Inventory grid of product cards with photo, category, price, and a stock badge coloured by level, beside an add-product tile, discount rates, and a grid or list toggle.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/inventrack/04-procurement.webp",
+        caption: "Procurement and deliveries",
+        surface: "Web app",
+        url: "inventrack-jade.vercel.app/procurement",
+        alt: "Procurement page: a restock request builder with supplier and delivery type, auto-restock, and generate purchase order; a pending request list; and a deliveries table of quantity ordered against quantity received per supplier, with the receiving details.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/inventrack/05-stock-log.webp",
+        caption: "Stock log audit trail",
+        surface: "Web app",
+        url: "inventrack-jade.vercel.app/stock-log",
+        alt: "Stock log audit trail listing every stock movement with product, quantity, an in, out or customer return badge, timestamp, remarks, who processed it, and a return action, under running totals in and out.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/inventrack/06-sales-history.webp",
+        caption: "Sales history",
+        surface: "Web app",
+        url: "inventrack-jade.vercel.app/sales-history",
+        alt: "Sales history table of sales and returns with cashier, products and quantities, total in pesos, and date, with returns shown struck through in red.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/inventrack/07-offline-sync.webp",
+        caption: "Offline Excel sync",
+        surface: "Web app",
+        url: "inventrack-jade.vercel.app/offline-sync",
+        alt: "Offline Excel sync: download a blank sales log template before an outage, then upload the filled spreadsheet to sync offline sales back into the database.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/inventrack/08-users.webp",
+        caption: "Staff and roles",
+        surface: "Web app",
+        url: "inventrack-jade.vercel.app/users",
+        alt: "Users page splitting staff into administrators and cashiers, each with email, role badge, active status, and edit controls.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/inventrack/09-login.webp",
+        caption: "Sign in",
+        surface: "Web app",
+        url: "inventrack-jade.vercel.app/login",
+        alt: "InvenTrack sign-in card with email and password fields and a legend of the two access levels: admin with full access, cashier with POS checkout only.",
+      },
+    ],
   },
   {
     id: "licensure",
     title: "LiCEnSURE",
-    tagline: "ML Decision-Support System — USTP",
+    tagline: "ML Decision-Support System: USTP",
     description:
       "Forecasts Civil Engineering licensure exam outcomes so staff can intervene early. Random Forest with SMOTE for class imbalance, tuned via RandomizedSearchCV, with SHAP surfacing per-student feature contributions so results are explainable rather than a black box.",
     tags: ["Python", "FastAPI", "Next.js", "TypeScript", "Firebase"],
@@ -62,34 +156,207 @@ export const projects: Project[] = [
   {
     id: "nva-go",
     title: "NVAGo",
-    tagline: "Booking & Point-of-Sale Platform — Capstone",
+    tagline: "Booking and Point-of-Sale Platform: Capstone",
     description:
-      "Booking and POS platform for NVA Printing Services, delivered as a full engagement: proposal, functional validation, testing, and technical documentation — for a client originally served as a print designer.",
+      "Booking and POS platform for NVA Printing Services, delivered as a full engagement: proposal, functional validation, testing, and technical documentation, for a client originally served as a print designer.",
     tags: ["React Native", "Expo", "React", "PostgreSQL", "Supabase"],
     color: "gold",
     client: true,
     github: "https://github.com/kroue/nva-go",
+    screens: [
+      {
+        ...DESKTOP,
+        height: 7237,
+        src: "/projects/nva-go/01-website.webp",
+        caption: "Public website, full page",
+        surface: "Public website",
+        url: "nva-go-website.vercel.app",
+        alt: "The full NVA Printing Services website: a hero reading One stop shop for your printing needs, four product categories, corporate giveaways, a four-step ordering guide, rush orders, a photo gallery, store location with map, and an FAQ.",
+      },
+      {
+        ...MOBILE,
+        src: "/projects/nva-go/02-website-mobile.webp",
+        caption: "Public website on a phone",
+        surface: "Public website",
+        alt: "The NVA Printing Services website on a phone, with the hero stacked above full-width Get a Quote and Messenger buttons and a fixed bottom bar for Call, Messenger, and Get a Quote.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/nva-go/03-console-home.webp",
+        caption: "Staff dashboard",
+        surface: "Booking & POS console",
+        url: "nva-go.vercel.app/homepage",
+        alt: "NVAGo staff dashboard: a welcome banner over panels for orders waiting for pickup, recent transactions, unread messages, sales today, and payments waiting for validation, beside a sidebar for home, orders, products and customers.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/nva-go/04-catalog.webp",
+        caption: "Product catalog",
+        surface: "Booking & POS console",
+        url: "nva-go.vercel.app/products",
+        alt: "Product catalog of printing products as photo cards, including acrylic medals and plaques, calling cards, ceramic mugs, DTF prints, glass plaques, PVC ID cards and lanyards, with counts of available and unavailable products.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/nva-go/05-login.webp",
+        caption: "Staff sign in",
+        surface: "Booking & POS console",
+        url: "nva-go.vercel.app",
+        alt: "NVAGo console sign-in: the NVAGo wordmark and a one-line pitch on the left, a username and password form on the right, and a separate admin login button.",
+      },
+    ],
   },
   {
     id: "portfolio",
     title: "Portfolio",
-    tagline: "Personal Site — 3D & Terminal UI",
+    tagline: "Personal Site: 3D and Terminal UI",
     description:
       "This site. Built with Next.js and React Three Fiber, featuring an interactive 3D scene and a terminal-style interface.",
     tags: ["Next.js", "React", "TypeScript", "Firebase", "Tailwind CSS"],
     color: "cyan",
     github: "https://github.com/kroue",
     live: "https://kroue-dev.vercel.app",
+    screens: [
+      {
+        ...DESKTOP,
+        src: "/projects/portfolio/01-hero.webp",
+        caption: "Hero",
+        surface: "Site",
+        url: "kroue-dev.vercel.app",
+        alt: "Portfolio hero: the name kuroe in a violet gradient over a field of floating wireframe shapes, a typed role line, a one-paragraph pitch, and buttons to see the projects or start a conversation.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/portfolio/02-about.webp",
+        caption: "About, with the working terminal",
+        surface: "Site",
+        url: "kroue-dev.vercel.app/#about",
+        alt: "About section: a bio and pull quote on the left, an interactive terminal on the right, and a rule-separated row of three stats.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/portfolio/03-stack.webp",
+        caption: "Stack and skill orb",
+        surface: "Site",
+        url: "kroue-dev.vercel.app/#stack",
+        alt: "Stack section: skills listed in four numbered tiers, beside a 3D orb ringed with skill labels that runs to the edge of the screen.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/portfolio/04-experience.webp",
+        caption: "Experience",
+        surface: "Site",
+        url: "kroue-dev.vercel.app/#experience",
+        alt: "Experience section: a vertical tab list of client projects with the selected one's role summary and bullet points, over a strip for internship, earlier roles and education.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/portfolio/05-projects.webp",
+        caption: "Projects carousel",
+        surface: "Site",
+        url: "kroue-dev.vercel.app/#projects",
+        alt: "Projects section: a carousel card with the project write-up and an open case file button beside a cover built from the project's own screens.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/portfolio/07-case-file.webp",
+        caption: "Case file view",
+        surface: "Site",
+        url: "kroue-dev.vercel.app/?project=lantaw",
+        alt: "A full-screen case file: the project write-up pinned on the left and its captured screens grouped by product surface on the right.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/portfolio/06-contact.webp",
+        caption: "Contact",
+        surface: "Site",
+        url: "kroue-dev.vercel.app/#contact",
+        alt: "Contact section: availability notes and social links on the left, and a name, email and message form on the right.",
+      },
+      {
+        ...MOBILE,
+        src: "/projects/portfolio/08-hero-mobile.webp",
+        caption: "Hero on a phone",
+        surface: "Site",
+        alt: "The portfolio hero on a phone, with the name, role, pitch and stacked buttons.",
+      },
+      {
+        ...MOBILE,
+        src: "/projects/portfolio/09-about-mobile.webp",
+        caption: "About on a phone",
+        surface: "Site",
+        alt: "The About section on a phone, with the bio and pull quote stacked above the terminal.",
+      },
+    ],
   },
   {
-    id: "lantaw-mobile",
-    title: "Lantaw Mobile",
-    tagline: "Mobile App — Client Experience",
+    id: "lantaw",
+    title: "Lantaw",
+    tagline: "Rewarded-Ads Platform: Mobile App and Admin Console",
     description:
-      "Cross-platform mobile companion for the Lantaw platform, engineered for responsive user experience, touch interactions, and mobile accessibility.",
-    tags: ["React Native", "Expo", "TypeScript", "Firebase"],
+      "Viewers earn points for watching brand campaigns in a cross-platform mobile app, then redeem them for rewards. A web admin console runs the other side: advertisers, campaign moderation, the rewards catalog and its stock, redemption approvals, and the points ledger.",
+    tags: ["React Native", "Expo", "TypeScript", "React", "TanStack Router", "Recharts", "Tailwind CSS"],
     color: "purple",
     github: "https://github.com/kroue/lantaw-mobile",
+    live: "https://lantaw-admin.vercel.app",
+    screens: [
+      {
+        ...DESKTOP,
+        src: "/projects/lantaw/01-overview.webp",
+        caption: "Overview",
+        surface: "Admin console",
+        url: "lantaw-admin.vercel.app",
+        alt: "Lantaw admin overview: four KPI cards for active users, live ads, points awarded and rewards claimed, a seven-day revenue and views area chart, an ad plan mix donut, and tables for pending moderation and latest redemptions.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/lantaw/04-ads.webp",
+        caption: "Ads & campaigns moderation",
+        surface: "Admin console",
+        url: "lantaw-admin.vercel.app/ads",
+        alt: "Ads and campaigns table listing each campaign with its thumbnail, advertiser, plan, budget, points per view, views and status, with approve, pause and reject controls per row.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/lantaw/05-rewards.webp",
+        caption: "Rewards catalog",
+        surface: "Admin console",
+        url: "lantaw-admin.vercel.app/rewards",
+        alt: "Rewards catalog as product cards with photos, points cost, stock count and an active toggle; the out-of-stock card shows its stock in red with the toggle off.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/lantaw/02-users.webp",
+        caption: "Users",
+        surface: "Admin console",
+        url: "lantaw-admin.vercel.app/users",
+        alt: "Users table with avatar, email, points balance, referrals, join date and an active, pending or suspended status badge.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/lantaw/03-advertisers.webp",
+        caption: "Advertisers",
+        surface: "Admin console",
+        url: "lantaw-admin.vercel.app/advertisers",
+        alt: "Advertisers table with brand, category, active ads, spend and verification status, plus verify and block actions.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/lantaw/06-redemptions.webp",
+        caption: "Redemption requests",
+        surface: "Admin console",
+        url: "lantaw-admin.vercel.app/redemptions",
+        alt: "Redemption requests table with request ID, user, reward, points, request date and status, and fulfill or cancel actions.",
+      },
+      {
+        ...DESKTOP,
+        src: "/projects/lantaw/07-transactions.webp",
+        caption: "Wallet & transactions",
+        surface: "Admin console",
+        url: "lantaw-admin.vercel.app/transactions",
+        alt: "Points ledger listing earn, redeem, payout and top-up entries with signed amounts in green or red, a note, and a date.",
+      },
+    ],
   },
   {
     id: "vitalsense",

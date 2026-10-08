@@ -11,15 +11,14 @@ interface SectionHeaderProps {
   title: string;
   lede?: string;
   inView: boolean;
-  /** Accent used for the kicker and the rule. */
+  /** Accent used for the kicker. */
   accent?: string;
 }
 
 /**
- * Shared editorial header for About / Stack / Projects / Contact. Every section
- * previously repeated a centred kicker + centred gradient headline, which made
- * them indistinguishable while scrolling. Numbering them and pushing everything
- * left gives the page a spine.
+ * The numeral is a graphic element, not a label: it sits oversized behind and
+ * to the left of the headline so the two overlap. Previously it was a small
+ * outlined number in its own grid column, which read as a list marker.
  */
 export default function SectionHeader({
   index,
@@ -30,55 +29,58 @@ export default function SectionHeader({
   accent = "var(--accent-2)",
 }: SectionHeaderProps) {
   return (
-    <header className="w-full">
-      <div className="section-head">
+    <header className="relative w-full">
+      <motion.span
+        aria-hidden="true"
+        className="index-huge absolute"
+        style={{ left: "-0.06em", top: "-0.22em", zIndex: 0 }}
+        initial={{ opacity: 0, x: -30 }}
+        animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+        transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
+      >
+        {index}
+      </motion.span>
+
+      <div
+        className="relative"
+        style={{ zIndex: 1, paddingLeft: "clamp(1.5rem, 6vw, 5.5rem)" }}
+      >
         <motion.span
-          aria-hidden="true"
-          className="section-index"
-          initial={{ opacity: 0, x: -20 }}
-          animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-          transition={{ duration: 0.5, ease: [0.215, 0.61, 0.355, 1] }}
+          className="section-label"
+          style={{ color: accent, display: "block", marginBottom: "0.4rem" }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+          transition={{ duration: 0.5, delay: 0.05 }}
         >
-          {index}
+          {label}
         </motion.span>
 
-        <div className="min-w-0">
-          <motion.span
-            className="section-label"
-            style={{ color: accent }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-          >
-            {label}
-          </motion.span>
-
-          <RevealText
-            text={title}
-            elementType="h2"
-            delay={0.15}
-            className="section-title gradient-text-accent"
-          />
-
-          {lede && (
-            <motion.p
-              className="section-lede mt-4"
-              initial={{ opacity: 0, y: 12 }}
-              animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              {lede}
-            </motion.p>
-          )}
-        </div>
+        <RevealText
+          text={title}
+          elementType="h2"
+          delay={0.12}
+          className="section-title gradient-text-accent"
+        />
       </div>
 
+      {lede && (
+        <motion.p
+          className="section-lede measure-wide mt-5"
+          style={{ paddingLeft: "clamp(1.5rem, 6vw, 5.5rem)" }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          {lede}
+        </motion.p>
+      )}
+
       <motion.hr
-        className="rule"
+        className="rule mt-6"
         initial={{ scaleX: 0 }}
         animate={inView ? { scaleX: 1 } : { scaleX: 0 }}
         transition={{ duration: 0.7, delay: 0.15, ease: [0.215, 0.61, 0.355, 1] }}
-        style={{ transformOrigin: "left" }}
+        style={{ transformOrigin: "left", marginLeft: "clamp(1.5rem, 6vw, 5.5rem)" }}
       />
     </header>
   );

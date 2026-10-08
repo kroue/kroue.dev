@@ -13,26 +13,23 @@ const SkillOrb = dynamic(
   { ssr: false }
 );
 
-// Mirrors the résumé's skill groupings.
+// Mirrors the résumé's skill groupings. Tiers share one accent: the label
+// names the tier, so colour has nothing left to encode.
 const TIERS = [
   {
     label: "Web",
-    color: "#865DFF",
     skills: ["React", "Next.js", "Angular", "Vue", "TypeScript", "JavaScript", "Tailwind CSS", "shadcn/ui", "Recharts"],
   },
   {
     label: "Mobile",
-    color: "#E384FF",
     skills: ["Kotlin", "Jetpack Compose", "Material 3", "Hilt", "Room", "WorkManager", "React Native", "Expo"],
   },
   {
     label: "Backend / Data",
-    color: "#FFA3FD",
     skills: ["Firebase", "Supabase", "PostgreSQL", "FastAPI", "Django", "Python", "SQL", "REST APIs"],
   },
   {
     label: "Tools & Practices",
-    color: "#5EC8FF",
     skills: ["Vercel", "Vite", "Git", "VS Code", "Offline-first", "Clean arch.", "PWA", "RLS", "Testing"],
   },
 ];
@@ -63,8 +60,6 @@ export default function Stack() {
       className="section scroll-mt-16" 
       ref={containerRef}
     >
-      <div className="backdrop backdrop-rings" aria-hidden="true" />
-
       <ShapeTransition color="var(--accent-2)" direction="diamond" delay={0.2}>
         <motion.div
           style={{ opacity }}
@@ -80,104 +75,83 @@ export default function Stack() {
           accent="var(--accent-1)"
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          {/* 3D Orb */}
-          <motion.div
-            custom={2}
-            variants={flipIn}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            className="w-full h-[320px] md:h-[380px] flex justify-center mb-10 relative"
-          >
-            <SkillOrb />
-            {/* Legend */}
-            {/* Derived from TIERS so the legend can never drift from the data. */}
-            <ul
-              className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-4 flex-wrap justify-center z-20 mono list-none"
-              style={{ fontSize: "0.65rem" }}
-            >
-              {TIERS.map((tier) => (
-                <li
-                  key={tier.label}
-                  className="flex items-center gap-1.5"
-                  style={{ color: tier.color }}
-                >
-                  <span
-                    aria-hidden="true"
-                    style={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: "var(--radius-pill)",
-                      background: tier.color,
-                    }}
-                  />
-                  {tier.label}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Tier breakdown */}
-          <div className="flex flex-col gap-3.5" style={{ perspective: 1000 }}>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(0,46%)] gap-8 lg:gap-6 items-center mt-10">
+          {/* Tiers as a hairline rail. Four bordered cards gave every tier the
+              same weight and repeated the card grid used by every section. */}
+          <ol className="rail">
             {TIERS.map((tier, idx) => (
-              <motion.div
+              <motion.li
                 key={tier.label}
-                custom={3 + idx}
+                custom={idx}
                 variants={flipIn}
                 initial="hidden"
                 animate={inView ? "visible" : "hidden"}
-                className="card p-5"
-                style={{
-                  // Tier colour carried on the left edge instead of the whole
-                  // border, so four differently-tinted boxes stop competing.
-                  borderLeft: `3px solid ${tier.color}`,
-                }}
               >
-                <h3
-                  className="mono flex items-center gap-2 mb-3"
-                  style={{
-                    fontSize: "0.72rem",
-                    letterSpacing: "0.15em",
-                    color: tier.color,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {tier.label}
-                  <span
-                    aria-hidden="true"
-                    className="flex-1"
+                <span className="rail-num">
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
+
+                <div className="min-w-0">
+                  <h3
+                    className="mono flex items-baseline gap-3 mb-2"
                     style={{
-                      height: 1,
-                      background: `color-mix(in srgb, ${tier.color} 30%, transparent)`,
+                      fontSize: "0.74rem",
+                      letterSpacing: "0.16em",
+                      color: "var(--text-primary)",
+                      textTransform: "uppercase",
                     }}
-                  />
-                  <span style={{ color: "var(--text-subtle)" }}>
-                    {String(tier.skills.length).padStart(2, "0")}
-                  </span>
-                </h3>
-                <ul className="flex flex-wrap gap-2.5 list-none">
-                  {tier.skills.map((skill) => (
-                    <li key={skill}>
-                      <motion.a
-                        href={getTechUrl(skill)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        whileHover={{ scale: 1.08, y: -2 }}
-                        transition={{ type: "spring", stiffness: 400 }}
-                        className="chip chip-accent"
-                        style={{ "--chip-color": tier.color } as React.CSSProperties}
-                      >
-                        <TechIcon name={skill} size={14} />
-                        {skill}
-                      </motion.a>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
+                  >
+                    {tier.label}
+                    <span style={{ color: "var(--text-subtle)", fontSize: "0.66rem" }}>
+                      {String(tier.skills.length).padStart(2, "0")}
+                    </span>
+                  </h3>
+
+                  <ul className="flex flex-wrap gap-x-3 gap-y-1.5 list-none">
+                    {tier.skills.map((skill) => (
+                      <li key={skill}>
+                        <a
+                          href={getTechUrl(skill)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mono hit-44 inline-flex items-center gap-1.5"
+                          style={{
+                            fontSize: "0.78rem",
+                            color: "var(--text-muted)",
+                            textDecoration: "none",
+                            transition: "color var(--dur) var(--ease-out)",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = "var(--accent-1)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = "var(--text-muted)";
+                          }}
+                        >
+                          <TechIcon name={skill} size={13} />
+                          {skill}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.li>
             ))}
-          </div>
+          </ol>
+
+          {/* The orb runs past the shell to the viewport edge instead of sitting
+              boxed in a half-width column. */}
+          <motion.div
+            custom={0}
+            variants={flipIn}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            className="h-[300px] md:h-[380px] lg:h-[520px] relative order-first lg:order-none bleed-right"
+          >
+            <SkillOrb />
+          </motion.div>
         </div>
-        </div>
+      </div>
         </motion.div>
       </ShapeTransition>
     </section>
